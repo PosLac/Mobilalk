@@ -1,0 +1,4 @@
+Implicit intentek (url megnyitása, location, sharetext): 3. gyak video vége
+spinner, phone etc: 4. gyak video (GUI II.) eleje
+töltés és állapotok figyelése, broadcast (7. gyak vidi 50:00)
+ha nem megy az adatlekérés:      allow read, write: if request.auth != null;
