@@ -9,6 +9,9 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
+import android.view.animation.Animation;
+import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
 
@@ -29,6 +32,7 @@ public class RegisterActivity extends AppCompatActivity {
 
     private SharedPreferences preferences;
     private FirebaseAuth mAuth;
+    Button b;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -71,6 +75,10 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     public void register(View view) {
+        b = (Button)findViewById(R.id.registerButton);
+        Animation animation = AnimationUtils.loadAnimation(RegisterActivity.this, R.anim.bounce);
+        b.startAnimation(animation);
+
         String userName = userNameEditText.getText().toString();
         String email  = userEmailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
@@ -97,6 +105,10 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     public void cancel(View view) {
+        b = (Button)findViewById(R.id.cancel);
+        Animation animation = AnimationUtils.loadAnimation(RegisterActivity.this, R.anim.bounce);
+        b.startAnimation(animation);
+
         finish();
     }
 

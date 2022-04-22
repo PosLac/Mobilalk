@@ -5,6 +5,8 @@
  import android.os.Bundle;
  import android.util.Log;
  import android.view.View;
+ import android.view.animation.Animation;
+ import android.view.animation.AnimationUtils;
  import android.widget.Button;
  import android.widget.EditText;
  import android.widget.Toast;
@@ -40,6 +42,7 @@
      private SharedPreferences preferences;
      private FirebaseAuth mAuth;
      private GoogleSignInClient mGoogleSignInClient;
+     Button b;
 
      @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -64,6 +67,7 @@
          getSupportLoaderManager().restartLoader(0, null, this);
 
          Log.i(LOG_TAG, "onCreate");
+
     }
 
      @Override
@@ -105,6 +109,12 @@
      }
 
      public void login(View view) {
+         b = (Button)findViewById(R.id.loginButton);
+         Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
+         b.startAnimation(animation);
+
+         //TODO üres bemenetre
+
          String userName = userNameET.getText().toString();
          String password = passwordET.getText().toString();
          //Log.i(LOG_TAG, "Bejelentkezett: " + userName + ", jelszó: " + password);
@@ -124,6 +134,10 @@
      }
 
      public void loginAsGuest(View view) {
+         b = (Button)findViewById(R.id.guestLoginButton);
+         Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
+         b.startAnimation(animation);
+
          mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
              @Override
              public void onComplete(@NonNull Task<AuthResult> task) {
@@ -139,11 +153,19 @@
      }
 
      public void loginWithGoogle(View view) {
+         b = (Button)findViewById(R.id.googleSignInButton);
+         Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
+         b.startAnimation(animation);
+
          Intent signInIntent = mGoogleSignInClient.getSignInIntent();
          startActivityForResult(signInIntent, RC_SIGN_IN);
      }
 
      public void register(View view) {
+         b = (Button)findViewById(R.id.registerButton);
+         Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
+         b.startAnimation(animation);
+
          Intent intent = new Intent(this, RegisterActivity.class);
          intent.putExtra("SECRET_KEY", SECRET_KEY);
          startActivity(intent);
