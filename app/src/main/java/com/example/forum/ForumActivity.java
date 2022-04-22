@@ -1,11 +1,17 @@
 package com.example.forum;
 
+import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.app.AlarmManager;
+import android.app.job.JobInfo;
+import android.app.job.JobScheduler;
+import android.content.ComponentName;
 import android.content.res.TypedArray;
+import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
@@ -38,9 +44,11 @@ public class ForumActivity extends AppCompatActivity {
     private FirebaseFirestore mFirestore;
     private CollectionReference mQuestions;
 
+    private NotificationHandler mNotificationHandler;
     private int gridNumber = 1; //oszlopszám
     private boolean viewRow = true;
 
+    @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -64,6 +72,9 @@ public class ForumActivity extends AppCompatActivity {
         mQuestions = mFirestore.collection("Questions");
 
         queryData();
+
+        mNotificationHandler = new NotificationHandler(this);
+        mNotificationHandler.send("Welcome back!");
     }
 
 
