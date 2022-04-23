@@ -10,6 +10,7 @@ import android.app.AlarmManager;
 import android.app.job.JobInfo;
 import android.app.job.JobScheduler;
 import android.content.ComponentName;
+import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
@@ -43,6 +44,7 @@ public class ForumActivity extends AppCompatActivity {
 
     private FirebaseFirestore mFirestore;
     private CollectionReference mQuestions;
+    private static final int SECRET_KEY = 99;
 
     private NotificationHandler mNotificationHandler;
     private int gridNumber = 1; //oszlopszám
@@ -125,25 +127,11 @@ public class ForumActivity extends AppCompatActivity {
         //mAdapter.notifyDataSetChanged();
     }
 
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
         getMenuInflater().inflate(R.menu.question_menu, menu);
-        MenuItem menuItem = menu.findItem(R.id.search_bar);
-        SearchView searchView = (SearchView) MenuItemCompat.getActionView(menuItem);
-        searchView.setOnQueryTextListener(new SearchView.OnQueryTextListener() {
-            @Override
-            public boolean onQueryTextSubmit(String s) {
-                return false;
-            }
-
-            @Override
-            public boolean onQueryTextChange(String s) {
-                Log.d(LOG_TAG, s);
-                mAdapter.getFilter().filter(s);
-                return false;
-            }
-        });
         return true;
     }
 
@@ -155,9 +143,11 @@ public class ForumActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 finish();
                 return true;
-            case R.id.settings_button:
-                Log.d(LOG_TAG, "Settings clicked!");
-                FirebaseAuth.getInstance().signOut();
+            case R.id.new_question_button:
+                Log.d(LOG_TAG, "New question clicked!");
+                Intent intent = new Intent(this, NewQuestion.class);
+                intent.putExtra("SECRET_KEY", SECRET_KEY);
+                startActivity(intent);
                 finish();
                 return true;
             case R.id.view_selector:

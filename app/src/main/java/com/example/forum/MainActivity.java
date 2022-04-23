@@ -251,7 +251,7 @@
      @Override
      protected void onStop() {
          super.onStop();
-         mediaPlayer.release();
+         //mediaPlayer.release();
          Log.i(LOG_TAG, "onStop");
      }
 
@@ -264,8 +264,7 @@
          editor.putString("userName", userNameET.getText().toString());
          editor.putString("password", passwordET.getText().toString());
          editor.apply();
-         mediaPlayer.release();
-
+         //mediaPlayer.release();
          Log.i(LOG_TAG, "onPause");
      }
 

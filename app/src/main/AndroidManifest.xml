@@ -13,6 +13,7 @@
             android:name=".ForumActivity"
             android:exported="false" />
         <activity android:name=".RegisterActivity" />
+        <activity android:name=".NewQuestion"/>
         <activity
             android:name=".MainActivity"
             android:exported="true">
