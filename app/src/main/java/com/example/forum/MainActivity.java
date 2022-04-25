@@ -95,6 +95,7 @@
                          mediaPlayer.setDataSource("https://fwesh.yonle.repl.co");
                          mediaPlayer.prepare();
                          mediaPlayer.start();
+                         Toast.makeText(MainActivity.this, "Thanks", Toast.LENGTH_LONG).show();
                      } catch (IOException e) {
                          e.printStackTrace();
                      }

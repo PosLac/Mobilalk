@@ -73,27 +73,25 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
 
-
     public void register(View view) {
-        b = (Button)findViewById(R.id.registerButton);
+        b = (Button) findViewById(R.id.registerButton);
         Animation animation = AnimationUtils.loadAnimation(RegisterActivity.this, R.anim.bounce);
         b.startAnimation(animation);
 
         String userName = userNameEditText.getText().toString();
-        String email  = userEmailEditText.getText().toString();
+        String email = userEmailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
         String passwordConfirm = passwordConfirmEditText.getText().toString();
 
-        if(!password.equals(passwordConfirm)){
+        if (!password.equals(passwordConfirm)) {
             Log.e(LOG_TAG, "Nem egyeznek a jelszavak.");
             return;
         }
         Log.i(LOG_TAG, "Regisztrált: " + userName + ", email: " + email);
-        //startForum();
         mAuth.createUserWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
-                if(task.isSuccessful()) {
+                if (task.isSuccessful()) {
                     Log.d(LOG_TAG, "User created successfully");
                     startForum();
                 } else {
@@ -101,11 +99,12 @@ public class RegisterActivity extends AppCompatActivity {
                     Toast.makeText(RegisterActivity.this, "User wasn't created successfully: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                 }
             }
-        });    }
+        });
+    }
 
 
     public void cancel(View view) {
-        b = (Button)findViewById(R.id.cancel);
+        b = (Button) findViewById(R.id.cancel);
         Animation animation = AnimationUtils.loadAnimation(RegisterActivity.this, R.anim.bounce);
         b.startAnimation(animation);
 
