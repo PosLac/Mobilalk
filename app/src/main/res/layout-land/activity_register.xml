@@ -82,29 +82,30 @@
             android:textAlignment="center"
             android:inputType="textPassword"/>
 
-        <LinearLayout
-            android:layout_width="wrap_content"
-            android:layout_height="wrap_content"
-            android:orientation="horizontal"
-            android:layout_gravity="center"
-            android:textAlignment="center"
-            android:layout_marginTop="50dp">
-
-            <Button
-                android:id="@+id/registerButton"
+            <LinearLayout
                 android:layout_width="wrap_content"
                 android:layout_height="wrap_content"
-                android:text="@string/registration"
-                android:onClick="register"/>
+                android:orientation="horizontal"
+                android:layout_gravity="center"
+                android:textAlignment="center"
+                android:layout_marginTop="50dp"
+                android:layout_marginBottom="20dp">
 
-            <Button
-                android:id="@+id/cancel"
-                android:layout_width="wrap_content"
-                android:layout_height="wrap_content"
-                android:layout_marginStart="40dp"
-                android:text="@string/cancel"
-                android:onClick="cancel"/>
-        </LinearLayout>
+                    <Button
+                        android:id="@+id/registerButton"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:text="@string/registration"
+                        android:onClick="register"/>
+
+                    <Button
+                        android:id="@+id/cancel"
+                        android:layout_width="wrap_content"
+                        android:layout_height="wrap_content"
+                        android:layout_marginStart="40dp"
+                        android:text="@string/cancel"
+                        android:onClick="cancel"/>
+            </LinearLayout>
         </LinearLayout>
     </ScrollView>
 </LinearLayout>

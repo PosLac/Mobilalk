@@ -1,55 +1,54 @@
 <?xml version="1.0" encoding="utf-8"?>
-<RelativeLayout
-    xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="match_parent">
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".Profile">
 
-    <TextView
-        android:id="@+id/new_question"
+    <ImageView
+        android:id="@+id/userImage"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"/>
+
+    <EditText
+        android:id="@+id/userName"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:text="Új kérdés"
+        android:hint="UserName"
         android:layout_marginTop="30dp"
         android:textAlignment="center"
         android:layout_alignParentStart="true"
         android:layout_alignParentEnd="true"
-        android:textSize="20dp"/>
+        android:textSize="20dp"
+        android:layout_below="@id/userImage"/>
 
     <EditText
-        android:id="@+id/title"
+        android:id="@+id/userEmail"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
         android:layout_marginTop="50dp"
         android:layout_marginLeft="10dp"
         android:layout_marginRight="10dp"
-        android:hint="Cím"
-        android:layout_below="@id/new_question"/>
+        android:textAlignment="center"
+        android:hint="Email"
+        android:layout_below="@id/userName"/>
 
-
-    <EditText
-        android:id="@+id/question"
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content"
-        android:layout_marginTop="20dp"
-        android:layout_marginLeft="10dp"
-        android:layout_marginRight="10dp"
-        android:hint="Kérdés szövege"
-        android:layout_below="@id/title"/>
 
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:orientation="horizontal"
-        android:layout_below="@id/question"
+        android:layout_below="@id/userEmail"
         android:layout_marginTop="50dp"
         android:layout_centerHorizontal="true">
 
         <Button
-            android:id="@+id/post"
+            android:id="@+id/update"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="Küldés"
-            android:onClick="onPost"/>
+            android:layout_marginStart="40dp"
+            android:text="Frissítés"
+            android:onClick="updateProfile"/>
 
         <Button
             android:id="@+id/cancel"

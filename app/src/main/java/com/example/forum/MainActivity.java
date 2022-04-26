@@ -1,6 +1,6 @@
  package com.example.forum;
 
- import android.Manifest;
+
  import android.content.Context;
  import android.content.Intent;
  import android.content.SharedPreferences;
@@ -15,13 +15,12 @@
  import android.view.animation.AnimationUtils;
  import android.widget.Button;
  import android.widget.EditText;
+ import android.widget.TextView;
  import android.widget.Toast;
 
  import androidx.annotation.NonNull;
  import androidx.annotation.Nullable;
- import androidx.annotation.RequiresApi;
  import androidx.appcompat.app.AppCompatActivity;
- import androidx.core.app.ActivityCompat;
  import androidx.loader.app.LoaderManager;
  import androidx.loader.content.Loader;
 
@@ -37,8 +36,7 @@
  import com.google.firebase.auth.FirebaseAuth;
  import com.google.firebase.auth.GoogleAuthProvider;
 
- import java.io.IOException;import android.content.pm.PackageManager;
-
+ import java.io.IOException;
 
  public class MainActivity extends AppCompatActivity
  implements LoaderManager.LoaderCallbacks<String> {
@@ -49,6 +47,7 @@
      EditText userNameET;
      EditText passwordET;
 
+     private NotificationHandler mNotificationHandler;
      final private int REQUEST_CODE_ASK_PERMISSIONS = 420;
 
      boolean isRunning = false;
@@ -67,7 +66,7 @@
      protected void onCreate(Bundle savedInstanceState) {
          super.onCreate(savedInstanceState);
          setContentView(R.layout.activity_main);
-         Toast.makeText(MainActivity.this, "Shake your phone!", Toast.LENGTH_LONG).show();
+         Toast.makeText(MainActivity.this, "Rázd meg a telefont!", Toast.LENGTH_LONG).show();
 
          userNameET = findViewById(R.id.editTextUserName);
          passwordET = findViewById(R.id.editTextPassword);
@@ -166,6 +165,9 @@
                      public void onComplete(@NonNull Task<AuthResult> task) {
                          if (task.isSuccessful()) {
                              Log.d(LOG_TAG, "signInWithCredential:success");
+
+                             mNotificationHandler = new NotificationHandler(MainActivity.this);
+                             mNotificationHandler.send("Welcome back!");
                              startForum();
                          } else {
                              Log.w(LOG_TAG, "signInWithCredential:failure", task.getException());
@@ -188,13 +190,15 @@
          String password = passwordET.getText().toString();
 
          if (userName.equals("") || password.equals("")) {
-             Toast.makeText(MainActivity.this, "Empty username or password.", Toast.LENGTH_LONG).show();
+             Toast.makeText(MainActivity.this, "Minden mező ki van töltve?", Toast.LENGTH_LONG).show();
          } else {
              mAuth.signInWithEmailAndPassword(userName, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                  @Override
                  public void onComplete(@NonNull Task<AuthResult> task) {
                      if (task.isSuccessful()) {
                          Log.d(LOG_TAG, "Login was successfull.");
+                         mNotificationHandler = new NotificationHandler(MainActivity.this);
+                         mNotificationHandler.send("Welcome back!");
                          startForum();
                      } else {
                          Log.d(LOG_TAG, "User login fail:", task.getException());
@@ -215,6 +219,8 @@
              public void onComplete(@NonNull Task<AuthResult> task) {
                  if (task.isSuccessful()) {
                      Log.d(LOG_TAG, "Anonim login was successfull.");
+                     mNotificationHandler = new NotificationHandler(MainActivity.this);
+                     mNotificationHandler.send("Welcome back!");
                      startForum();
                  } else {
                      Log.d(LOG_TAG, "Anonim user login fail:", task.getException());
@@ -257,6 +263,12 @@
      }
 
      @Override
+     protected void onDestroy() {
+         super.onDestroy();
+         mediaPlayer.release();
+     }
+
+     @Override
      protected void onPause() {
          mSensorManager.unregisterListener(mShakeDetector);
          super.onPause();
@@ -291,8 +303,8 @@
 
      @Override
      public void onLoadFinished(@NonNull Loader<String> loader, String data) {
-         Button button = findViewById(R.id.guestLoginButton);
-         button.setText(data);
+         TextView text = findViewById(R.id.randomAsyncTextView);
+         text.setText(data);
      }
 
      @Override

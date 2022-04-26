@@ -2,14 +2,9 @@ package com.example.forum;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
-import androidx.core.view.MenuItemCompat;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
-import android.app.AlarmManager;
-import android.app.job.JobInfo;
-import android.app.job.JobScheduler;
-import android.content.ComponentName;
 import android.content.Intent;
 import android.content.res.TypedArray;
 import android.os.Build;
@@ -17,19 +12,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
-import android.view.View;
-import android.widget.FrameLayout;
-import android.widget.SearchView;
-import android.widget.TextView;
 
-import com.google.android.gms.tasks.OnSuccessListener;
-import com.google.firebase.FirebaseApp;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.QueryDocumentSnapshot;
-import com.google.firebase.firestore.QuerySnapshot;
 
 import java.util.ArrayList;
 
@@ -46,7 +34,6 @@ public class ForumActivity extends AppCompatActivity {
     private CollectionReference mQuestions;
     private static final int SECRET_KEY = 99;
 
-    private NotificationHandler mNotificationHandler;
     private int gridNumber = 1; //oszlopszám
     private boolean viewRow = true;
 
@@ -75,15 +62,12 @@ public class ForumActivity extends AppCompatActivity {
 
         queryData();
 
-        mNotificationHandler = new NotificationHandler(this);
-        mNotificationHandler.send("Welcome back!");
     }
 
 
     private void queryData(){
         mQuestionsData.clear();
 
-        //mQuestions.whereEqualTo();
         mQuestions.orderBy("userName").limit(10).get().addOnSuccessListener(queryDocumentSnapshots -> {
             for(QueryDocumentSnapshot document : queryDocumentSnapshots){
                 Question question = document.toObject(Question.class);
@@ -145,7 +129,7 @@ public class ForumActivity extends AppCompatActivity {
                 return true;
             case R.id.new_question_button:
                 Log.d(LOG_TAG, "New question clicked!");
-                Intent intent = new Intent(this, NewQuestion.class);
+                Intent intent = new Intent(this, Profile.class);
                 intent.putExtra("SECRET_KEY", SECRET_KEY);
                 startActivity(intent);
                 finish();
@@ -169,4 +153,5 @@ public class ForumActivity extends AppCompatActivity {
         GridLayoutManager layoutManager = (GridLayoutManager) mRecyclerView.getLayoutManager();
         layoutManager.setSpanCount(spanCount);
     }
+
 }

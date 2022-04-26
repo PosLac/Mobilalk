@@ -24,13 +24,7 @@ public class RandomAsyncLoader extends AsyncTaskLoader<String> {
     public String loadInBackground() {
         Random random = new Random();
         int n = random.nextInt(11);
-        int ms = n * 300;
-        try {
-            Thread.sleep(ms);
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
-
-        return "Bejelentekezés vendégként " + ms + " ms után!";
+        int online = n * 171 + 10;
+        return "Jelenleg " + online + " online felhasználó.";
     }
 }
