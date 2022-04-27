@@ -1,6 +1,5 @@
 package com.example.forum;
 
-
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
@@ -15,51 +14,35 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
-
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 
 public class RegisterActivity extends AppCompatActivity {
-    ImageView userImage;
-    EditText userNameEditText;
-    EditText userEmailEditText;
-    EditText passwordEditText;
-    EditText passwordConfirmEditText;
-
+    private ImageView userImage;
+    private EditText userNameEditText;
+    private EditText userEmailEditText;
+    private EditText passwordEditText;
+    private EditText passwordConfirmEditText;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private DocumentReference documentReference;
     private static final String LOG_TAG = RegisterActivity.class.getName();
     private static final String PREF_KEY = RegisterActivity.class.getPackage().toString();
-    private static final int SECRET_KEY = 99;
-
     private SharedPreferences preferences;
     private FirebaseAuth mAuth;
-    Button b;
-    private CollectionReference Users;
+    private Button b;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
+       documentReference = db.collection("Users").document("profile");
+//       storageReference = firebaseStorage.getInstance().getReference("profile images");
 
-        //Majd ezt hasznald
-//        Bundle bundle = getIntent().getExtras();
-//        bundle.getInt("SECRET_KEY");
-
-        /*
-        int secret_key = getIntent().getIntExtra("SECRET_KEY", 0);
-        if(secret_key != 99){
-            //visszater az elozo activityre
-            finish();
-        }
-        */
-
-        //mainben editTextUserName, itt userNameEditText
         userImage = findViewById(R.id.userImage);
         userNameEditText = findViewById(R.id.userNameEditText);
         userEmailEditText = findViewById(R.id.userEmailEditText);
@@ -69,10 +52,10 @@ public class RegisterActivity extends AppCompatActivity {
         preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
 
         //bejelentkezesnel beirt cuccok regisztracional mar be legyenek irva
-        String userName = preferences.getString("userName", "");
+        String email = preferences.getString("email", "");
         String password = preferences.getString("password", "");
 
-        userNameEditText.setText(userName);
+        userEmailEditText.setText(email);
         passwordEditText.setText(password);
         passwordConfirmEditText.setText(password);
 
@@ -93,6 +76,7 @@ public class RegisterActivity extends AppCompatActivity {
         String email = userEmailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
         String passwordConfirm = passwordConfirmEditText.getText().toString();
+
         if (userName.equals("") || password.equals("")) {
             Toast.makeText(RegisterActivity.this, "Minden mező ki van töltve?", Toast.LENGTH_LONG).show();
         } else {
@@ -113,7 +97,7 @@ public class RegisterActivity extends AppCompatActivity {
                                 if (task.isSuccessful()) {
                                     Toast.makeText(RegisterActivity.this, "Sikeres", Toast.LENGTH_SHORT).show();
                                 } else {
-                                    Toast.makeText(RegisterActivity.this, "Failed", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(RegisterActivity.this, "Hiba", Toast.LENGTH_SHORT).show();
                                 }
                             }
                         });
@@ -121,7 +105,7 @@ public class RegisterActivity extends AppCompatActivity {
                         startForum();
                     } else {
                         Log.d(LOG_TAG, "User wasn't created successfully:", task.getException());
-                        Toast.makeText(RegisterActivity.this, "User wasn't created successfully: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                        Toast.makeText(RegisterActivity.this, "Sikertelen regisztráció: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                     }
                 }
             });

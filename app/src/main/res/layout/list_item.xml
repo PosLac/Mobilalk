@@ -21,11 +21,11 @@
             android:layout_width="match_parent"
             android:layout_height="wrap_content"
             android:layout_below="@id/userImage"
-            android:layout_marginLeft="10dp"
+            android:layout_marginStart="10dp"
             android:layout_marginTop="-70dp"
-            android:layout_toRightOf="@id/userImage"
+            android:layout_toEndOf="@id/userImage"
             android:padding="8dp"
-            android:textSize="20dp"
+            android:textSize="20sp"
             android:text="@string/userName_placeholder"
             android:textColor="?android:textColorSecondary" />
 
@@ -36,7 +36,7 @@
             android:layout_height="wrap_content"
             android:layout_below="@id/userImage"
             android:padding="8dp"
-            android:textSize="25dp"
+            android:textSize="25sp"
             android:text="@string/title_placeholder" />
 
         <TextView
@@ -45,7 +45,7 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_below="@id/title"
-            android:textSize="15dp"
+            android:textSize="15sp"
             android:padding="8dp"
             android:text="@string/description_placeholder" />
 

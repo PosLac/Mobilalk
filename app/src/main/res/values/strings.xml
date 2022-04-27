@@ -9,10 +9,12 @@
     <string name="password_again">Jelszó megerősítése</string>
     <string name="cancel">Mégse</string>
     <string name="title_placeholder">Cím</string>
-    <string name="item_placeholder">Leírás</string>
-    <string name="item_info_placeholder">Kérdés</string>
     <string name="userName_placeholder">userName</string>
     <string name="description_placeholder">Kérdés</string>
+    <string name="email">Email</string>
+    <string name="login_as_guest">Bejelentkezés vendégként</string>
+    <string name="login_with_google">Bejelentkezés google fiókkal</string>
+    <string name="welcome">Üdvözöljük</string>
 
     <string-array name="userNames">
         <item>Tikitaki001</item>

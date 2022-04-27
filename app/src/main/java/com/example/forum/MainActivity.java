@@ -15,15 +15,9 @@
  import android.view.animation.AnimationUtils;
  import android.widget.Button;
  import android.widget.EditText;
- import android.widget.TextView;
  import android.widget.Toast;
-
  import androidx.annotation.NonNull;
- import androidx.annotation.Nullable;
  import androidx.appcompat.app.AppCompatActivity;
- import androidx.loader.app.LoaderManager;
- import androidx.loader.content.Loader;
-
  import com.google.android.gms.auth.api.signin.GoogleSignIn;
  import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
  import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -35,32 +29,26 @@
  import com.google.firebase.auth.AuthResult;
  import com.google.firebase.auth.FirebaseAuth;
  import com.google.firebase.auth.GoogleAuthProvider;
-
  import java.io.IOException;
 
- public class MainActivity extends AppCompatActivity
- implements LoaderManager.LoaderCallbacks<String> {
+ public class MainActivity extends AppCompatActivity{
+// implements LoaderManager.LoaderCallbacks<String> {
      private static final String LOG_TAG = MainActivity.class.getName();
      private static final String PREF_KEY = MainActivity.class.getPackage().toString();
      private static final int RC_SIGN_IN = 123;
      private static final int SECRET_KEY = 99;
-     EditText userNameET;
-     EditText passwordET;
-
+     private EditText emailET;
+     private EditText passwordET;
      private NotificationHandler mNotificationHandler;
-     final private int REQUEST_CODE_ASK_PERMISSIONS = 420;
-
      boolean isRunning = false;
      private SharedPreferences preferences;
      private FirebaseAuth mAuth;
      private GoogleSignInClient mGoogleSignInClient;
-     Button b;
-
+     private Button b;
      private SensorManager mSensorManager;
      private Sensor mAccelerometer;
      private SensorActivity mShakeDetector;
-
-     MediaPlayer mediaPlayer;
+     private MediaPlayer mediaPlayer;
 
      @Override
      protected void onCreate(Bundle savedInstanceState) {
@@ -68,7 +56,7 @@
          setContentView(R.layout.activity_main);
          Toast.makeText(MainActivity.this, "Rázd meg a telefont!", Toast.LENGTH_LONG).show();
 
-         userNameET = findViewById(R.id.editTextUserName);
+         emailET = findViewById(R.id.editTextEmail);
          passwordET = findViewById(R.id.editTextPassword);
 
          preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
@@ -78,8 +66,7 @@
                  .requestIdToken(getString(R.string.default_web_client_id))
                  .requestEmail().build();
          mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-         getSupportLoaderManager().restartLoader(0, null, this);
-
+//         getSupportLoaderManager().restartLoader(0, null, this);
 
          mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
          mAccelerometer = mSensorManager
@@ -103,43 +90,6 @@
          });
          Log.i(LOG_TAG, "onCreate");
      }
-
-//     @RequiresApi(api = Build.VERSION_CODES.Q)
-     public void onShake(){
-         if (Build.VERSION.SDK_INT >= 23 && isRunning == false) {
-//             if (ActivityCompat.checkSelfPermission(MainActivity.this, Manifest.permission.ACTIVITY_RECOGNITION) != PackageManager.PERMISSION_GRANTED) {
-//                 requestPermissions(new String[]{Manifest.permission.ACTIVITY_RECOGNITION}, REQUEST_CODE_ASK_PERMISSIONS);
-//             }
-//             else {
-                 isRunning = true;
-                 mediaPlayer = new MediaPlayer();
-                 try {
-                     mediaPlayer.setDataSource("https://fwesh.yonle.repl.co");
-                     mediaPlayer.prepare();
-                     mediaPlayer.start();
-                 } catch (IOException e) {
-                     e.printStackTrace();
-                 }
-             }
-//         }
-     }
-     /*
-     @RequiresApi(api = Build.VERSION_CODES.Q)
-     @Override
-     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-         switch (requestCode) {
-             case REQUEST_CODE_ASK_PERMISSIONS:
-                 if(grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                     onShake();
-                 } else {
-                     Toast.makeText(this, "Permission denied!", Toast.LENGTH_SHORT).show();
-                 }
-                 break;
-             default:
-                 super.onRequestPermissionsResult(requestCode, permissions, grantResults);
-         }
-     }
-     */
 
      @Override
      public void onActivityResult(int requestCode, int resultCode, Intent data) {
@@ -186,23 +136,23 @@
          Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
          b.startAnimation(animation);
 
-         String userName = userNameET.getText().toString();
+         String email = emailET.getText().toString();
          String password = passwordET.getText().toString();
 
-         if (userName.equals("") || password.equals("")) {
+         if (email.equals("") || password.equals("")) {
              Toast.makeText(MainActivity.this, "Minden mező ki van töltve?", Toast.LENGTH_LONG).show();
          } else {
-             mAuth.signInWithEmailAndPassword(userName, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
+             mAuth.signInWithEmailAndPassword(email, password).addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
                  @Override
                  public void onComplete(@NonNull Task<AuthResult> task) {
                      if (task.isSuccessful()) {
                          Log.d(LOG_TAG, "Login was successfull.");
                          mNotificationHandler = new NotificationHandler(MainActivity.this);
-                         mNotificationHandler.send("Welcome back!");
+                         mNotificationHandler.send("Jó újra látni!");
                          startForum();
                      } else {
                          Log.d(LOG_TAG, "User login fail:", task.getException());
-                         Toast.makeText(MainActivity.this, "User login fail: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                         Toast.makeText(MainActivity.this, "Sikertelen bejelentkezés: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                      }
                  }
              });
@@ -220,11 +170,11 @@
                  if (task.isSuccessful()) {
                      Log.d(LOG_TAG, "Anonim login was successfull.");
                      mNotificationHandler = new NotificationHandler(MainActivity.this);
-                     mNotificationHandler.send("Welcome back!");
+                     mNotificationHandler.send("Jó újra látni!");
                      startForum();
                  } else {
                      Log.d(LOG_TAG, "Anonim user login fail:", task.getException());
-                     Toast.makeText(MainActivity.this, "Anonim user login fail: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
+                     Toast.makeText(MainActivity.this, "Vendégbejelentkezés sikertelen: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
                  }
              }
          });
@@ -264,20 +214,22 @@
 
      @Override
      protected void onDestroy() {
-         super.onDestroy();
-         mediaPlayer.release();
+         super.onDestroy();if(isRunning){
+             mediaPlayer.release();
+         }
      }
 
      @Override
      protected void onPause() {
          mSensorManager.unregisterListener(mShakeDetector);
          super.onPause();
-
+         if(isRunning){
+             mediaPlayer.release();
+         }
          SharedPreferences.Editor editor = preferences.edit();
-         editor.putString("userName", userNameET.getText().toString());
+         editor.putString("email", emailET.getText().toString());
          editor.putString("password", passwordET.getText().toString());
          editor.apply();
-         //mediaPlayer.release();
          Log.i(LOG_TAG, "onPause");
      }
 
@@ -295,19 +247,19 @@
          Log.i(LOG_TAG, "onRestart");
      }
 
-     @NonNull
-     @Override
-     public Loader<String> onCreateLoader(int id, @Nullable Bundle args) {
-         return new RandomAsyncLoader(this);
-     }
-
-     @Override
-     public void onLoadFinished(@NonNull Loader<String> loader, String data) {
-         TextView text = findViewById(R.id.randomAsyncTextView);
-         text.setText(data);
-     }
-
-     @Override
-     public void onLoaderReset(@NonNull Loader<String> loader) {
-     }
+//     @NonNull
+//     @Override
+//     public Loader<String> onCreateLoader(int id, @Nullable Bundle args) {
+//         return new RandomAsyncLoader(this);
+//     }
+//
+//     @Override
+//     public void onLoadFinished(@NonNull Loader<String> loader, String data) {
+//         TextView text = findViewById(R.id.randomAsyncTextView);
+//         text.setText(data);
+//     }
+//
+//     @Override
+//     public void onLoaderReset(@NonNull Loader<String> loader) {
+//     }
  }

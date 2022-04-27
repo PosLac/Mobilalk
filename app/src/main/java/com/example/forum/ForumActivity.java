@@ -25,15 +25,12 @@ public class ForumActivity extends AppCompatActivity {
 
     private static final String LOG_TAG = ForumActivity.class.getName();
     private FirebaseUser user;
-
     private RecyclerView mRecyclerView;
     private ArrayList<Question> mQuestionsData;
     private QuestionAdapter mAdapter;
-
     private FirebaseFirestore mFirestore;
     private CollectionReference mQuestions;
     private static final int SECRET_KEY = 99;
-
     private int gridNumber = 1; //oszlopszám
     private boolean viewRow = true;
 
@@ -64,7 +61,6 @@ public class ForumActivity extends AppCompatActivity {
 
     }
 
-
     private void queryData(){
         mQuestionsData.clear();
 
@@ -92,8 +88,6 @@ public class ForumActivity extends AppCompatActivity {
         TypedArray userImageResources = getResources().
                 obtainTypedArray(R.array.userImages);
 
-        //mQuestionList.clear();
-
         for (int i = 0; i < userNameList.length; i++) {
 
             Log.d(LOG_TAG, userNameList[i] +
@@ -108,9 +102,8 @@ public class ForumActivity extends AppCompatActivity {
                     userImageResources.getResourceId(i, 0)));
         }
         userImageResources.recycle();
-        //mAdapter.notifyDataSetChanged();
+        mAdapter.notifyDataSetChanged();
     }
-
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -127,8 +120,8 @@ public class ForumActivity extends AppCompatActivity {
                 FirebaseAuth.getInstance().signOut();
                 finish();
                 return true;
-            case R.id.new_question_button:
-                Log.d(LOG_TAG, "New question clicked!");
+            case R.id.profile_button:
+                Log.d(LOG_TAG, "Profile clicked!");
                 Intent intent = new Intent(this, Profile.class);
                 intent.putExtra("SECRET_KEY", SECRET_KEY);
                 startActivity(intent);
@@ -153,5 +146,4 @@ public class ForumActivity extends AppCompatActivity {
         GridLayoutManager layoutManager = (GridLayoutManager) mRecyclerView.getLayoutManager();
         layoutManager.setSpanCount(spanCount);
     }
-
 }

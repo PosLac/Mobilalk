@@ -10,24 +10,11 @@
         app:showAsAction="always"
         />
 
-<!--    <item-->
-<!--        android:id="@+id/search_bar"-->
-<!--        android:title="Search"-->
-<!--        android:icon="@drawable/ic_search"-->
-<!--        app:showAsAction="always"-->
-<!--        />-->
-
     <item
-        android:id="@+id/new_question_button"
-        android:title="Új kérdés"
+        android:id="@+id/profile_button"
+        android:title="Profilom"
         app:showAsAction="never"
         android:orderInCategory="2"/>
-
-<!--    <item-->
-<!--        android:id="@+id/settings_button"-->
-<!--        android:title="Beállítások"-->
-<!--        app:showAsAction="never"-->
-<!--        android:orderInCategory="2"/>-->
 
     <item
         android:id="@+id/log_out_button"

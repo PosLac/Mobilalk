@@ -103,6 +103,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
 
                 @Override
                 public void onClick(View view) {
+                    //TODO
                     Log.d("Activity", "Kérdés megnyitása.");
                 }
             });
