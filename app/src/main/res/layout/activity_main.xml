@@ -4,7 +4,7 @@
     xmlns:tools="http://schemas.android.com/tools"
     android:layout_width="match_parent"
     android:layout_height="match_parent"
-    tools:context=".MainActivity">
+    tools:context=".Activities.MainActivity">
 
     <TextView
         android:id="@+id/welcomeTextView"
@@ -19,21 +19,6 @@
         android:textAlignment="center"
         android:textSize="24sp" />
 
-<!--    <TextView-->
-<!--        android:id="@+id/randomAsyncTextView"-->
-<!--        android:layout_width="wrap_content"-->
-<!--        android:layout_height="wrap_content"-->
-<!--        android:layout_alignParentStart="true"-->
-<!--        android:layout_alignParentEnd="true"-->
-<!--        android:layout_marginTop="10dp"-->
-<!--        android:layout_marginBottom="100dp"-->
-<!--        android:ems="10"-->
-<!--        android:text="Jelenleg 200 online felhasználó."-->
-<!--        android:textAlignment="center"-->
-<!--        android:textSize="18sp"-->
-<!--        android:layout_below="@id/welcomeTextView"/>-->
-
-
     <EditText
         android:id="@+id/editTextEmail"
         android:layout_width="match_parent"
@@ -44,7 +29,7 @@
         android:layout_marginRight="10dp"
         android:ems="10"
         android:hint="@string/email"
-        android:inputType="textEmailAddress"/>
+        android:inputType="textEmailAddress" />
 
     <EditText
         android:id="@+id/editTextPassword"

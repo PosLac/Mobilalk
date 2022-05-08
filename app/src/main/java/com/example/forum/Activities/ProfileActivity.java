@@ -1,4 +1,4 @@
-package com.example.forum;
+package com.example.forum.Activities;
 
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
@@ -12,12 +12,15 @@ import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 import android.widget.ImageView;
+import android.widget.TextView;
 import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.annotation.Nullable;
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
+
+import com.example.forum.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
 import com.google.android.gms.tasks.OnSuccessListener;
@@ -35,13 +38,13 @@ import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 import java.util.UUID;
 
-public class Profile extends AppCompatActivity {
+public class ProfileActivity extends AppCompatActivity {
 
     private EditText userNameEditText;
-    private EditText userEmailEditText;
+    private TextView userEmailTextView;
     private ImageView userProfileImage;
     private Uri imageUri;
-    private static final String LOG_TAG = Profile.class.getName();
+    private static final String LOG_TAG = ProfileActivity.class.getName();
     final private int REQUEST_CODE_ASK_PERMISSIONS = 420;
     private DocumentReference reference;
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
@@ -58,7 +61,7 @@ public class Profile extends AppCompatActivity {
 
         userProfileImage = findViewById(R.id.userProfileImage);
         userNameEditText = findViewById(R.id.userName);
-        userEmailEditText = findViewById(R.id.userEmail);
+        userEmailTextView = findViewById(R.id.userEmail);
 
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference("profile images");
@@ -80,7 +83,7 @@ public class Profile extends AppCompatActivity {
 
     void checkUserPermission(){
         if(Build.VERSION.SDK_INT >= 23){
-            if(ActivityCompat.checkSelfPermission(Profile.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
+            if(ActivityCompat.checkSelfPermission(ProfileActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                 requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSIONS);
                 return;
             }
@@ -116,6 +119,7 @@ public class Profile extends AppCompatActivity {
         }
     }
 
+    //Kiválasztott kép feltöltése Firebase Storage-ba
     private void uploadPicture() {
         final ProgressDialog pd = new ProgressDialog(this);
         pd.setTitle("Képfeltöltés folyamatban..");
@@ -136,14 +140,14 @@ public class Profile extends AppCompatActivity {
             @Override
             public void onFailure(@NonNull Exception e) {
                 pd.dismiss();
-                Toast.makeText(Profile.this, "Hiba a feltöltés során", Toast.LENGTH_LONG).show();
+                Toast.makeText(ProfileActivity.this, "Hiba a feltöltés során", Toast.LENGTH_LONG).show();
                 Log.d(LOG_TAG, "hiba");
             }
         });
     }
 
     private void ShowDialog() {
-        AlertDialog.Builder builder = new AlertDialog.Builder(Profile.this);
+        AlertDialog.Builder builder = new AlertDialog.Builder(ProfileActivity.this);
         builder.setTitle("Törlés");
         builder.setMessage("Biztosan szeretnéd törölni a fiókod? A művelet később nem vonható vissza.");
         builder.setPositiveButton("Igen", new DialogInterface.OnClickListener() {
@@ -154,14 +158,14 @@ public class Profile extends AppCompatActivity {
                 documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(Profile.this, "Fiók törölve", Toast.LENGTH_SHORT).show();
-
-                        Log.i(LOG_TAG, "siker");
+                        Toast.makeText(ProfileActivity.this, "Fiók törölve", Toast.LENGTH_SHORT).show();
+                        setContentView(R.layout.activity_main);
+                        Log.i(LOG_TAG, "Siker");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Profile.this, "Fiók törlése sikertelen.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfileActivity.this, "Fiók törlése sikertelen.", Toast.LENGTH_SHORT).show();
                         Log.i(LOG_TAG, "gáz van " + e.getMessage());
                     }
                 });
@@ -169,14 +173,14 @@ public class Profile extends AppCompatActivity {
                 user.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(Profile.this, "Fiók törölve", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfileActivity.this, "Fiók törölve", Toast.LENGTH_SHORT).show();
 
                         Log.i(LOG_TAG, "siker");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(Profile.this, "Fiók törlése sikertelen.", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(ProfileActivity.this, "Fiók törlése sikertelen.", Toast.LENGTH_SHORT).show();
                         Log.i(LOG_TAG, "gáz van " + e.getMessage());
                     }
                 });
@@ -196,25 +200,6 @@ public class Profile extends AppCompatActivity {
 
     public void updateProfile(View view) {
         String name = userNameEditText.getText().toString();
-//        String email = userEmailEditText.getText().toString();
-
-//        final String randomKey = UUID.randomUUID().toString();
-//        StorageReference ref = storageReference.child("images/" + randomKey);
-
-//        uploadTask = ref.putFile(imageUri);
-//        Task<Uri> uriTask = uploadTask.continueWithTask(new Continuation<UploadTask.TaskSnapshot, Task<Uri>>() {
-//            @Override
-//            public Task<Uri> then(@NonNull Task<UploadTask.TaskSnapshot> task) throws Exception {
-//                if(!task.isSuccessful()){
-//                    throw task.getException();
-//                }
-//                return ref.getDownloadUrl();
-//            }
-//        }).addOnCompleteListener(new OnCompleteListener<Uri>() {
-//            @Override
-//            public void onComplete(@NonNull Task<Uri> task) {
-//                if(task.isSuccessful()){
-//                    Uri downloadUri = task.getResult();
 
         final DocumentReference sDoc = db.collection("Users").document(currentuid);
         Task<Void> voidTask = db.runTransaction(new Transaction.Function<Void>() {
@@ -223,25 +208,20 @@ public class Profile extends AppCompatActivity {
                 DocumentSnapshot snapshot = transaction.get(sDoc);
 
                 transaction.update(sDoc, "userName", name);
-//                            transaction.update(sDoc, "url", downloadUri.toString());
-                //transaction.update(sDoc, "email", email);
                 return null;
             }
         }).addOnSuccessListener(new OnSuccessListener<Void>() {
             @Override
             public void onSuccess(Void aVoid) {
-                Toast.makeText(Profile.this, "Frissítve", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileActivity.this, "Frissítve", Toast.LENGTH_SHORT).show();
             }
         }).addOnFailureListener(new OnFailureListener() {
             @Override
             public void onFailure(@NonNull Exception e) {
-                Toast.makeText(Profile.this, "Hiba", Toast.LENGTH_SHORT).show();
+                Toast.makeText(ProfileActivity.this, "Hiba", Toast.LENGTH_SHORT).show();
                 Log.i(LOG_TAG, e.getMessage());
             }
         });
-//                }
-//            }
-//        });
     }
 
     @Override
@@ -258,13 +238,11 @@ public class Profile extends AppCompatActivity {
 
                     String nameResult = task.getResult().getString("userName");
                     String emailResult = task.getResult().getString("email");
-//                    String url = task.getResult().getString("url");
 
-//                    Picasso.get().load(url).into(userProfileImage);
                     userNameEditText.setText(nameResult);
-                    userEmailEditText.setText(emailResult);
+                    userEmailTextView.setText(emailResult);
                 } else {
-                    Toast.makeText(Profile.this, "Hiba", Toast.LENGTH_SHORT).show();
+                    Toast.makeText(ProfileActivity.this, "Hiba", Toast.LENGTH_SHORT).show();
                     Log.i(LOG_TAG, "baj" + task.getException().getMessage() );
                 }
             }

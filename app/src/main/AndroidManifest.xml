@@ -12,12 +12,12 @@
         android:supportsRtl="true"
         android:theme="@style/Theme.Forum">
         <activity
-            android:name=".ForumActivity"
+            android:name=".Activities.ForumActivity"
             android:exported="false" />
-        <activity android:name=".RegisterActivity" />
-        <activity android:name=".Profile"/>
+        <activity android:name=".Activities.RegisterActivity" />
+        <activity android:name=".Activities.ProfileActivity"/>
         <activity
-            android:name=".MainActivity"
+            android:name=".Activities.MainActivity"
             android:exported="true">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

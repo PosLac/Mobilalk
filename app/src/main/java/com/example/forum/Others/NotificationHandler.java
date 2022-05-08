@@ -1,4 +1,4 @@
-package com.example.forum;
+package com.example.forum.Others;
 
 import android.app.NotificationChannel;
 import android.app.NotificationManager;
@@ -9,6 +9,9 @@ import android.graphics.Color;
 import android.os.Build;
 
 import androidx.core.app.NotificationCompat;
+
+import com.example.forum.Activities.ForumActivity;
+import com.example.forum.R;
 
 public class NotificationHandler {
     private static final String CHANNEL_ID = "forum_notification_channel";

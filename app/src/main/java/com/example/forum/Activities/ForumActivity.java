@@ -1,4 +1,4 @@
-package com.example.forum;
+package com.example.forum.Activities;
 
 import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
@@ -13,6 +13,9 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.forum.Models.Question;
+import com.example.forum.Others.QuestionAdapter;
+import com.example.forum.R;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -122,7 +125,7 @@ public class ForumActivity extends AppCompatActivity {
                 return true;
             case R.id.profile_button:
                 Log.d(LOG_TAG, "Profile clicked!");
-                Intent intent = new Intent(this, Profile.class);
+                Intent intent = new Intent(this, ProfileActivity.class);
                 intent.putExtra("SECRET_KEY", SECRET_KEY);
                 startActivity(intent);
                 finish();

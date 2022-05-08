@@ -1,4 +1,4 @@
- package com.example.forum;
+ package com.example.forum.Activities;
 
 
  import android.content.Context;
@@ -18,6 +18,10 @@
  import android.widget.Toast;
  import androidx.annotation.NonNull;
  import androidx.appcompat.app.AppCompatActivity;
+
+ import com.example.forum.Others.NotificationHandler;
+ import com.example.forum.R;
+ import com.example.forum.Others.ShakeSensor;
  import com.google.android.gms.auth.api.signin.GoogleSignIn;
  import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
  import com.google.android.gms.auth.api.signin.GoogleSignInClient;
@@ -32,7 +36,7 @@
  import java.io.IOException;
 
  public class MainActivity extends AppCompatActivity{
-// implements LoaderManager.LoaderCallbacks<String> {
+
      private static final String LOG_TAG = MainActivity.class.getName();
      private static final String PREF_KEY = MainActivity.class.getPackage().toString();
      private static final int RC_SIGN_IN = 123;
@@ -47,7 +51,7 @@
      private Button b;
      private SensorManager mSensorManager;
      private Sensor mAccelerometer;
-     private SensorActivity mShakeDetector;
+     private ShakeSensor mShakeDetector;
      private MediaPlayer mediaPlayer;
 
      @Override
@@ -66,13 +70,12 @@
                  .requestIdToken(getString(R.string.default_web_client_id))
                  .requestEmail().build();
          mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-//         getSupportLoaderManager().restartLoader(0, null, this);
 
          mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
          mAccelerometer = mSensorManager
                  .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
-         mShakeDetector = new SensorActivity();
-         mShakeDetector.setOnShakeListener(new SensorActivity.OnShakeListener() {
+         mShakeDetector = new ShakeSensor();
+         mShakeDetector.setOnShakeListener(new ShakeSensor.OnShakeListener() {
              public void onShake() {
                  if (Build.VERSION.SDK_INT >= 23 && isRunning == false) {
                      isRunning = true;
@@ -246,20 +249,4 @@
          super.onRestart();
          Log.i(LOG_TAG, "onRestart");
      }
-
-//     @NonNull
-//     @Override
-//     public Loader<String> onCreateLoader(int id, @Nullable Bundle args) {
-//         return new RandomAsyncLoader(this);
-//     }
-//
-//     @Override
-//     public void onLoadFinished(@NonNull Loader<String> loader, String data) {
-//         TextView text = findViewById(R.id.randomAsyncTextView);
-//         text.setText(data);
-//     }
-//
-//     @Override
-//     public void onLoaderReset(@NonNull Loader<String> loader) {
-//     }
  }

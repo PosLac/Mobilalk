@@ -3,7 +3,7 @@
     android:layout_width="match_parent"
     android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    tools:context=".Profile">
+    tools:context=".Activities.ProfileActivity">
 
     <ScrollView
         android:layout_width="match_parent"
@@ -36,14 +36,15 @@
                 android:textAlignment="center"
                 android:textSize="20sp" />
 
-            <EditText
+            <TextView
                 android:id="@+id/userEmail"
                 android:layout_width="match_parent"
                 android:layout_height="wrap_content"
                 android:layout_gravity="center"
                 android:layout_marginLeft="10dp"
                 android:layout_marginRight="10dp"
-                android:hint="Email"
+                android:textSize="20dp"
+                android:text="Email"
                 android:textAlignment="center" />
 
             <LinearLayout
@@ -66,6 +67,17 @@
                     android:layout_marginStart="40dp"
                     android:onClick="cancel"
                     android:text="@string/cancel" />
+
+                <Button
+                    android:id="@+id/delete"
+                    android:layout_width="wrap_content"
+                    android:layout_height="wrap_content"
+                    android:layout_marginStart="40dp"
+                    android:backgroundTint="#EA1111"
+                    android:onClick="deleteUser"
+                    android:text="Fiók törlése"
+                    android:textAlignment="center"
+                    android:textColor="#FFFFFF" />
             </LinearLayout>
         </LinearLayout>
     </ScrollView>

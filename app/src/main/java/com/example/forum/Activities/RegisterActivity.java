@@ -1,4 +1,4 @@
-package com.example.forum;
+package com.example.forum.Activities;
 
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
@@ -14,6 +14,9 @@ import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
+
+import com.example.forum.Models.User;
+import com.example.forum.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
 import com.google.firebase.auth.AuthResult;
@@ -41,7 +44,6 @@ public class RegisterActivity extends AppCompatActivity {
         setContentView(R.layout.activity_register);
 
        documentReference = db.collection("Users").document("profile");
-//       storageReference = firebaseStorage.getInstance().getReference("profile images");
 
         userImage = findViewById(R.id.userImage);
         userNameEditText = findViewById(R.id.userNameEditText);
@@ -51,7 +53,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
 
-        //bejelentkezesnel beirt cuccok regisztracional mar be legyenek irva
         String email = preferences.getString("email", "");
         String password = preferences.getString("password", "");
 
@@ -71,7 +72,6 @@ public class RegisterActivity extends AppCompatActivity {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        //String image = userImage.;
         String userName = userNameEditText.getText().toString();
         String email = userEmailEditText.getText().toString();
         String password = passwordEditText.getText().toString();
