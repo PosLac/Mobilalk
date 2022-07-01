@@ -1,0 +1,44 @@
+<?xml version="1.0" encoding="utf-8"?>
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    xmlns:tools="http://schemas.android.com/tools"
+    tools:context=".Activities.QuestionActivity">
+
+    <TextView
+        android:id="@+id/title"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Szoszi"
+        android:textAlignment="center"
+        android:layout_centerHorizontal="true"
+        android:layout_margin="30dp"
+        android:textSize="24sp"/>
+
+    <EditText
+        android:id="@+id/question_title"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Ide írd a kérdésedet"
+        android:layout_below="@+id/title"
+        android:layout_margin="10dp"
+        android:textSize="22sp"/>
+
+    <EditText
+        android:id="@+id/question_description"
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:hint="Hosszabb leírás"
+        android:layout_below="@+id/question_title"
+        android:layout_margin="10dp"/>
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_below="@+id/question_description"
+        android:layout_centerHorizontal="true"
+        android:layout_marginLeft="30dp"
+        android:layout_marginRight="30dp"
+        android:text="Kérdés kiírása"
+        android:onClick="submit"/>
+</RelativeLayout>

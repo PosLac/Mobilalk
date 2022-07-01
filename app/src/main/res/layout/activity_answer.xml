@@ -1,21 +1,14 @@
 <?xml version="1.0" encoding="utf-8"?>
-<androidx.cardview.widget.CardView xmlns:android="http://schemas.android.com/apk/res/android"
+<RelativeLayout xmlns:android="http://schemas.android.com/apk/res/android"
     android:layout_width="match_parent"
-    android:layout_height="wrap_content"
-    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:layout_height="match_parent"
     xmlns:tools="http://schemas.android.com/tools"
-    android:layout_margin="8dp"
-    tools:context=".Activities.ForumActivity">
-
-    <RelativeLayout
-        android:layout_width="match_parent"
-        android:layout_height="wrap_content">
+    tools:context=".Activities.AnswerActivity">
 
         <ImageView
             android:id="@+id/userImage"
             android:layout_width="70dp"
             android:layout_height="70dp"
-            android:padding="5dp"
             android:adjustViewBounds="true" />
 
         <TextView
@@ -52,5 +45,35 @@
             android:text="@string/description_placeholder"
             android:textSize="15sp" />
 
-    </RelativeLayout>
-</androidx.cardview.widget.CardView>
+
+        <ListView
+            android:id="@+id/answers"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/description"
+            android:layout_marginTop="30sp"
+            android:padding="8dp"
+            android:scrollbars="vertical"
+            android:textSize="15sp" />
+
+
+        <EditText
+            android:id="@+id/answer"
+            android:layout_width="match_parent"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/answers"
+            android:hint="Válasz megadása"
+            android:layout_marginTop="30sp"
+            android:padding="8dp"
+            android:textSize="15sp" />
+
+        <Button
+            android:id="@+id/doAnswer"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/answer"
+            android:layout_centerHorizontal="true"
+            android:text="Válaszol"
+            android:onClick="answer"/>
+
+</RelativeLayout>

@@ -1,6 +1,10 @@
 package com.example.forum.Others;
 
+import android.app.ProgressDialog;
 import android.content.Context;
+import android.content.Intent;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -11,11 +15,22 @@ import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
 import android.widget.TextView;
+
+import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
-import com.bumptech.glide.Glide;
+
+import com.example.forum.Activities.AnswerActivity;
 import com.example.forum.Models.Question;
 import com.example.forum.R;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
+import com.google.firebase.storage.FileDownloadTask;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
 
+
+import java.io.File;
+import java.io.IOException;
 import java.util.ArrayList;
 
 public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHolder> implements Filterable {
@@ -24,6 +39,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
     public ArrayList<Question> mQuestionDataAll = new ArrayList<>();;
     public Context mContext;
     public int lastPosition = -1;
+    private StorageReference mStorageReference;
 
     public QuestionAdapter(Context context, ArrayList<Question> itemsData){
         this.mQuestionData = itemsData;
@@ -102,22 +118,54 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
             mTitleText = itemView.findViewById(R.id.title);
             mDescriptionText = itemView.findViewById(R.id.description);
 
-            itemView.findViewById(R.id.open).setOnClickListener(new View.OnClickListener(){
+            itemView.setOnClickListener(new View.OnClickListener(){
 
                 @Override
                 public void onClick(View view) {
-                    //TODO
-                    Log.d("Activity", "Kérdés megnyitása.");
+                    Log.d("Activity", "Open question");
+                    Intent intent = new Intent(view.getContext(), AnswerActivity.class);
+                    intent.putExtra("TITLE", mQuestionData.get(getAdapterPosition()).getTitle());
+                    intent.putExtra("DESC", mQuestionData.get(getAdapterPosition()).getDescription());
+                    intent.putExtra("IMAGE", mQuestionData.get(getAdapterPosition()).getImageResource());
+                    intent.putExtra("NAME", mQuestionData.get(getAdapterPosition()).getUserName());
+                    intent.putStringArrayListExtra("ANSWERS",(ArrayList<String>) mQuestionData.get(getAdapterPosition()).getAnswers());
+                    view.getContext().startActivity(intent);
                 }
             });
         }
 
         public void bindTo(Question currentItem) {
+            final ProgressDialog pd = new ProgressDialog(mContext);
+            pd.setTitle("Kis türelmet...");
+            pd.show();
 
             mUserNameText.setText(currentItem.getUserName());
             mTitleText.setText(currentItem.getTitle());
             mDescriptionText.setText(currentItem.getDescription());
-            Glide.with(mContext).load(currentItem.getImageResource()).into(mUserImage);
+
+            mStorageReference = FirebaseStorage.getInstance().getReference().child("images/" + currentItem.getImageResource());
+
+            try{
+                final File localFile = File.createTempFile(currentItem.getImageResource(), "png");
+                mStorageReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                    @Override
+                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+                        Bitmap bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                        ((ImageView) mUserImage.findViewById(R.id.userImage)).setImageBitmap(bitmap);
+                        pd.dismiss();
+                    }
+                }).addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        e.printStackTrace();
+                        pd.dismiss();
+                    }
+                });
+
+            }catch (IOException e){
+                e.printStackTrace();
+            }
+
         }
     }
 }

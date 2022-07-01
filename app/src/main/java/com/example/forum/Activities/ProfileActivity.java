@@ -1,10 +1,13 @@
 package com.example.forum.Activities;
 
+import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
+import android.graphics.Bitmap;
+import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -20,6 +23,8 @@ import androidx.annotation.RequiresApi;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
+import com.bumptech.glide.Glide;
+import com.example.forum.Models.User;
 import com.example.forum.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -33,9 +38,13 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Transaction;
+import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
+
+import java.io.File;
+import java.io.IOException;
 import java.util.UUID;
 
 public class ProfileActivity extends AppCompatActivity {
@@ -53,18 +62,28 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String currentuid = user.getUid();
     private StorageReference storageReference;
+    private StorageReference mStorageReference;
+    private Bitmap bitmap;
 
+    @SuppressLint("ResourceType")
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile);
+
+//
+//        Intent intent = getIntent();
+////        currentUser = new User(intent.getStringExtra("currentUserName"), intent.getStringExtra("currentUserEmail"), intent.getStringExtra("currentUserImage"));
+
 
         userProfileImage = findViewById(R.id.userProfileImage);
         userNameEditText = findViewById(R.id.userName);
         userEmailTextView = findViewById(R.id.userEmail);
 
         storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference("profile images");
+        storageReference = storage.getReference("images");
+
+
 
         userProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
@@ -72,6 +91,8 @@ public class ProfileActivity extends AppCompatActivity {
                 checkUserPermission();
             }
         });
+
+//        Glide.with(this).load(intent.getIntExtra("currentUserImage", 2131230893)).into(userProfileImage);
     }
 
     private void choosePicture() {
@@ -126,7 +147,7 @@ public class ProfileActivity extends AppCompatActivity {
         pd.show();
 
         final String randomKey = UUID.randomUUID().toString();
-        StorageReference ref = storageReference.child("images/" + randomKey);
+        StorageReference ref = storageReference.child(randomKey);
 
         ref.putFile(imageUri).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
             @Override
@@ -136,14 +157,14 @@ public class ProfileActivity extends AppCompatActivity {
                 Log.d(LOG_TAG, "siker");
             }
         })
-        .addOnFailureListener(new OnFailureListener() {
-            @Override
-            public void onFailure(@NonNull Exception e) {
-                pd.dismiss();
-                Toast.makeText(ProfileActivity.this, "Hiba a feltöltés során", Toast.LENGTH_LONG).show();
-                Log.d(LOG_TAG, "hiba");
-            }
-        });
+                .addOnFailureListener(new OnFailureListener() {
+                    @Override
+                    public void onFailure(@NonNull Exception e) {
+                        pd.dismiss();
+                        Toast.makeText(ProfileActivity.this, "Hiba a feltöltés során", Toast.LENGTH_LONG).show();
+                        Log.d(LOG_TAG, "hiba");
+                    }
+                });
     }
 
     private void ShowDialog() {
@@ -228,26 +249,58 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onStart() {
         super.onStart();
 
+        final ProgressDialog pd = new ProgressDialog(this);
+        pd.setTitle("Kis türelmet..");
+        pd.show();
+
         reference = firestore.collection("Users").document(currentuid);
 
         reference.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-            @Override
-            public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                if (task.isSuccessful()) {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
 
-                    String nameResult = task.getResult().getString("userName");
-                    String emailResult = task.getResult().getString("email");
+                            String nameResult = task.getResult().getString("userName");
+                            String emailResult = task.getResult().getString("email");
+                            String imageResult = task.getResult().getString("userImage");
 
-                    userNameEditText.setText(nameResult);
-                    userEmailTextView.setText(emailResult);
-                } else {
-                    Toast.makeText(ProfileActivity.this, "Hiba", Toast.LENGTH_SHORT).show();
-                    Log.i(LOG_TAG, "baj" + task.getException().getMessage() );
-                }
-            }
-        });
+                            userNameEditText.setText(nameResult);
+                            userEmailTextView.setText(emailResult);
 
+                            mStorageReference = FirebaseStorage.getInstance().getReference().child("images/" + imageResult);
+
+                            try{
+                                final File localFile = File.createTempFile(imageResult, "png");
+                                mStorageReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
+                                    @Override
+                                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
+//                                        Toast.makeText(ProfileActivity.this, "Sikeres lekérés" ,Toast.LENGTH_SHORT).show();
+                                        bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
+                                        ((ImageView)findViewById(R.id.userProfileImage)).setImageBitmap(bitmap);
+                                        pd.dismiss();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+//                                        Toast.makeText(ProfileActivity.this, "Sikertelen lekérés" ,Toast.LENGTH_SHORT).show();
+                                        e.printStackTrace();
+                                        pd.dismiss();
+                                    }
+                                });
+
+                            }catch (IOException e){
+                                e.printStackTrace();
+                                pd.dismiss();
+                            }
+
+                        } else {
+                            pd.dismiss();
+                            Toast.makeText(ProfileActivity.this, "Hiba", Toast.LENGTH_SHORT).show();
+                            Log.i(LOG_TAG, "baj" + task.getException().getMessage() );
+                        }
+                    }
+                });
 
         Log.i(LOG_TAG, "onStart");
     }

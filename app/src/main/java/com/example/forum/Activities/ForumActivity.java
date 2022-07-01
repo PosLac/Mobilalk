@@ -12,8 +12,12 @@ import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
+import android.widget.Button;
+import android.widget.Toast;
 
 import com.example.forum.Models.Question;
+import com.example.forum.Models.User;
 import com.example.forum.Others.QuestionAdapter;
 import com.example.forum.R;
 import com.google.firebase.auth.FirebaseAuth;
@@ -30,12 +34,14 @@ public class ForumActivity extends AppCompatActivity {
     private FirebaseUser user;
     private RecyclerView mRecyclerView;
     private ArrayList<Question> mQuestionsData;
+    private ArrayList<User> mUsersData;
     private QuestionAdapter mAdapter;
     private FirebaseFirestore mFirestore;
     private CollectionReference mQuestions;
     private static final int SECRET_KEY = 99;
     private int gridNumber = 1; //oszlopszám
     private boolean viewRow = true;
+    private boolean guest;
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
@@ -44,9 +50,9 @@ public class ForumActivity extends AppCompatActivity {
         setContentView(R.layout.activity_forum);
 
         user = FirebaseAuth.getInstance().getCurrentUser();
-        if(user != null) {
+        if (user != null) {
             Log.d(LOG_TAG, "Authenticated user!");
-        }else{
+        } else {
             Log.d(LOG_TAG, "Unauthenticated user!");
             finish();
         }
@@ -59,54 +65,53 @@ public class ForumActivity extends AppCompatActivity {
 
         mFirestore = FirebaseFirestore.getInstance();
         mQuestions = mFirestore.collection("Questions");
-
+        guest = getIntent().getBooleanExtra("guest", false);
         queryData();
-
     }
 
     private void queryData(){
         mQuestionsData.clear();
 
-        mQuestions.orderBy("userName").limit(10).get().addOnSuccessListener(queryDocumentSnapshots -> {
+        mQuestions.limit(10).get().addOnSuccessListener(queryDocumentSnapshots -> {
             for(QueryDocumentSnapshot document : queryDocumentSnapshots){
                 Question question = document.toObject(Question.class);
                 mQuestionsData.add(question);
             }
 
             if(mQuestionsData.size() == 0){
-                initializeData();
+//                initializeData();
                 queryData();
             }
             mAdapter.notifyDataSetChanged();
         });
     }
-
-    private void initializeData() {
-        String[] userNameList = getResources()
-                .getStringArray(R.array.userNames);
-        String[] titleList = getResources().
-                getStringArray(R.array.titles);
-        String[] descriptionList = getResources().
-                getStringArray(R.array.descriptions);
-        TypedArray userImageResources = getResources().
-                obtainTypedArray(R.array.userImages);
-
-        for (int i = 0; i < userNameList.length; i++) {
-
-            Log.d(LOG_TAG, userNameList[i] +
-                    titleList[i] +
-                    descriptionList[i] +
-                    userImageResources.getResourceId(i, 0));
-
-            mQuestions.add(new Question(
-                    userNameList[i],
-                    titleList[i],
-                    descriptionList[i],
-                    userImageResources.getResourceId(i, 0)));
-        }
-        userImageResources.recycle();
-        mAdapter.notifyDataSetChanged();
-    }
+//
+//    private void initializeData() {
+//        String[] userNameList = getResources()
+//                .getStringArray(R.array.userNames);
+//        String[] titleList = getResources().
+//                getStringArray(R.array.titles);
+//        String[] descriptionList = getResources().
+//                getStringArray(R.array.descriptions);
+//        TypedArray userImageResources = getResources().
+//                obtainTypedArray(R.array.userImages);
+//
+//        for (int i = 0; i < userNameList.length; i++) {
+//
+//            Log.d(LOG_TAG, userNameList[i] +
+//                    titleList[i] +
+//                    descriptionList[i] +
+//                    userImageResources.getResourceId(i, 0));
+//
+//            mQuestions.add(new Question(
+//                    userNameList[i],
+//                    titleList[i],
+//                    descriptionList[i],
+//                    userImageResources.getResourceId(i, 0)));
+//        }
+//        userImageResources.recycle();
+//        mAdapter.notifyDataSetChanged();
+//    }
 
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
@@ -119,17 +124,41 @@ public class ForumActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.log_out_button:
-                Log.d(LOG_TAG, "Logout clicked!");
-                FirebaseAuth.getInstance().signOut();
-                finish();
-                return true;
+                    Log.d(LOG_TAG, "Logout clicked!");
+                    FirebaseAuth.getInstance().signOut();
+                    finish();
+                    return true;
             case R.id.profile_button:
                 Log.d(LOG_TAG, "Profile clicked!");
-                Intent intent = new Intent(this, ProfileActivity.class);
-                intent.putExtra("SECRET_KEY", SECRET_KEY);
-                startActivity(intent);
-                finish();
-                return true;
+
+                if(guest){
+                    Toast.makeText(this, "Vendégkét nem elérhető.", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+
+                else{
+
+                    Intent intent = new Intent(this, ProfileActivity.class);
+                    intent.putExtra("SECRET_KEY", SECRET_KEY);
+
+                    intent.putExtra("currentUserName", getIntent().getStringExtra("currentUserName"));
+                    intent.putExtra("currentUserEmail", getIntent().getStringExtra("currentUserEmail"));
+//                    intent.putExtra("currentUserImage", 2131230893);
+
+                    startActivity(intent);
+                    finish();
+                    return true;
+                }
+            case R.id.questions_button:
+                if(guest){
+                    Toast.makeText(this, "Vendégkét nem elérhető.", Toast.LENGTH_SHORT).show();
+                    return true;
+                }
+                else{
+                    Intent intent = new Intent(this, UsersQuestionsActivity.class);
+                    startActivity(intent);
+                }
+
             case R.id.view_selector:
                 Log.d(LOG_TAG, "Views clicked!");
                 if (viewRow) {
@@ -149,4 +178,35 @@ public class ForumActivity extends AppCompatActivity {
         GridLayoutManager layoutManager = (GridLayoutManager) mRecyclerView.getLayoutManager();
         layoutManager.setSpanCount(spanCount);
     }
+
+    public void add_question(View view) {
+
+        boolean guest = getIntent().getBooleanExtra("guest", false);
+        if(guest){
+            Toast.makeText(this, "Vendégkét nem elérhető.", Toast.LENGTH_SHORT).show();
+        }
+
+        else{
+            Intent intent = new Intent(this, QuestionActivity.class);
+            startActivity(intent);
+        }
+    }
+
+//
+//    public void answer(View view) {
+//        Log.d(LOG_TAG, "Answer clicked!");
+//        Intent intent = new Intent(this, AnswerActivity.class);
+////        curent_question
+////        intent.putExtra("CURRENT_QUESTION", );
+//        startActivity(intent);
+//        finish();
+//    }
+
+
+    @Override
+    protected void onResume() {
+        super.onResume();
+        queryData();
+    }
 }
+

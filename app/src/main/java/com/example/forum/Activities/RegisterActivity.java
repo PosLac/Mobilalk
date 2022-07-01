@@ -37,13 +37,15 @@ public class RegisterActivity extends AppCompatActivity {
     private SharedPreferences preferences;
     private FirebaseAuth mAuth;
     private Button b;
+    private String userName;
+    private String email;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
 
-       documentReference = db.collection("Users").document("profile");
+        documentReference = db.collection("Users").document("profile");
 
         userImage = findViewById(R.id.userImage);
         userNameEditText = findViewById(R.id.userNameEditText);
@@ -72,8 +74,9 @@ public class RegisterActivity extends AppCompatActivity {
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-        String userName = userNameEditText.getText().toString();
-        String email = userEmailEditText.getText().toString();
+        userName = userNameEditText.getText().toString();
+        email = userEmailEditText.getText().toString();
+        String userImage = "cb7e58bc-d23f-415a-9365-e3dfcfd1dc32";
         String password = passwordEditText.getText().toString();
         String passwordConfirm = passwordConfirmEditText.getText().toString();
 
@@ -90,7 +93,7 @@ public class RegisterActivity extends AppCompatActivity {
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         String uid = FirebaseAuth.getInstance().getCurrentUser().getUid();
-                        User user = new User(userName, email);
+                        User user = new User(userName, email, userImage);
                         db.collection("Users").document(uid).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
@@ -122,6 +125,10 @@ public class RegisterActivity extends AppCompatActivity {
 
     public void startForum() {
         Intent intent = new Intent(this, ForumActivity.class);
+        intent.putExtra("currentUserName", userName);
+        intent.putExtra("currentUserEmail", email);
+//        intent.putExtra("currentUserImage", "cb7e58bc-d23f-415a-9365-e3dfcfd1dc32");
+
         startActivity(intent);
     }
 
