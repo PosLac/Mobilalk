@@ -19,7 +19,7 @@ import android.widget.TextView;
 import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
-import com.example.forum.Activities.AnswerActivity;
+import com.example.forum.Activities.QuestionActivity;
 import com.example.forum.Models.Question;
 import com.example.forum.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -123,11 +123,13 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
                 @Override
                 public void onClick(View view) {
                     Log.d("Activity", "Open question");
-                    Intent intent = new Intent(view.getContext(), AnswerActivity.class);
+                    Intent intent = new Intent(view.getContext(), QuestionActivity.class);
                     intent.putExtra("TITLE", mQuestionData.get(getAdapterPosition()).getTitle());
                     intent.putExtra("DESC", mQuestionData.get(getAdapterPosition()).getDescription());
                     intent.putExtra("IMAGE", mQuestionData.get(getAdapterPosition()).getImageResource());
                     intent.putExtra("NAME", mQuestionData.get(getAdapterPosition()).getUserName());
+                    intent.putExtra("EMAIL", mQuestionData.get(getAdapterPosition()).getUserEmail());
+                    intent.putExtra("QUESTION_ID", mQuestionData.get(getAdapterPosition()).getId());
                     intent.putStringArrayListExtra("ANSWERS",(ArrayList<String>) mQuestionData.get(getAdapterPosition()).getAnswers());
                     view.getContext().startActivity(intent);
                 }

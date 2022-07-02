@@ -14,7 +14,8 @@
     android:orientation="horizontal"
     tools:context=".Activities.UsersQuestionsActivity"
     android:gravity="center"
-    android:onClick="open_question">
+    >
+<!--    android:onClick="open_question"-->
 
 <!--    <com.google.android.material.floatingactionbutton.FloatingActionButton-->
 

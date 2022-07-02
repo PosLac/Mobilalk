@@ -126,8 +126,6 @@ public class RegisterActivity extends AppCompatActivity {
     public void startForum() {
         Intent intent = new Intent(this, ForumActivity.class);
         intent.putExtra("currentUserName", userName);
-        intent.putExtra("currentUserEmail", email);
-        // TODO: 2022. 07. 02. törölni
 //        intent.putExtra("currentUserImage", "cb7e58bc-d23f-415a-9365-e3dfcfd1dc32");
 
         startActivity(intent);

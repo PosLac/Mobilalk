@@ -179,8 +179,20 @@ public class ProfileActivity extends AppCompatActivity {
                 documentReference.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
                     @Override
                     public void onSuccess(Void unused) {
-                        Toast.makeText(ProfileActivity.this, "Fiók törölve", Toast.LENGTH_SHORT).show();
                         setContentView(R.layout.activity_main);
+                        user.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
+                            @Override
+                            public void onSuccess(Void unused) {
+                                Toast.makeText(ProfileActivity.this, "Fiók törölve", Toast.LENGTH_SHORT).show();
+                                Log.i(LOG_TAG, "siker");
+                            }
+                        }).addOnFailureListener(new OnFailureListener() {
+                            @Override
+                            public void onFailure(@NonNull Exception e) {
+                                Toast.makeText(ProfileActivity.this, "Fiók törlése sikertelen.", Toast.LENGTH_SHORT).show();
+                                Log.i(LOG_TAG, "gáz van " + e.getMessage());
+                            }
+                        });
                         Log.i(LOG_TAG, "Siker");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
@@ -191,20 +203,7 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 });
 
-                user.delete().addOnSuccessListener(new OnSuccessListener<Void>() {
-                    @Override
-                    public void onSuccess(Void unused) {
-                        Toast.makeText(ProfileActivity.this, "Fiók törölve", Toast.LENGTH_SHORT).show();
 
-                        Log.i(LOG_TAG, "siker");
-                    }
-                }).addOnFailureListener(new OnFailureListener() {
-                    @Override
-                    public void onFailure(@NonNull Exception e) {
-                        Toast.makeText(ProfileActivity.this, "Fiók törlése sikertelen.", Toast.LENGTH_SHORT).show();
-                        Log.i(LOG_TAG, "gáz van " + e.getMessage());
-                    }
-                });
             }
         });
 

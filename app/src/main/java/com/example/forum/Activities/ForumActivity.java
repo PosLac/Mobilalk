@@ -70,7 +70,7 @@ public class ForumActivity extends AppCompatActivity {
     private void queryData(){
         mQuestionsData.clear();
 
-        mQuestions.limit(10).get().addOnSuccessListener(queryDocumentSnapshots -> {
+        mQuestions.orderBy("date").limit(10).get().addOnSuccessListener(queryDocumentSnapshots -> {
             for(QueryDocumentSnapshot document : queryDocumentSnapshots){
                 Question question = document.toObject(Question.class);
                 mQuestionsData.add(question);
@@ -140,8 +140,7 @@ public class ForumActivity extends AppCompatActivity {
                     intent.putExtra("SECRET_KEY", SECRET_KEY);
 
                     intent.putExtra("currentUserName", getIntent().getStringExtra("currentUserName"));
-                    intent.putExtra("currentUserEmail", getIntent().getStringExtra("currentUserEmail"));
-//                    intent.putExtra("currentUserImage", 2131230893);
+//                    intent.putExtra("EMAIL", mQuestionData.get(getAdapterPosition()).getUserEmail());
 
                     startActivity(intent);
                     finish();

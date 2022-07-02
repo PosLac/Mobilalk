@@ -7,6 +7,7 @@ import java.util.Date;
 import java.util.List;
 
 public class Question {
+    private String id;
     private String title;
     private String description;
     private List<String> answers = new ArrayList<String>();
@@ -33,7 +34,8 @@ public class Question {
 
     private String imageResource;
 
-    public Question(String title, String description, String userEmail, String imageResource, List<String> answers, String userName, Date date) {
+    public Question(String id, String title, String description, String userEmail, String imageResource, List<String> answers, String userName, Date date) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.answers = answers;
@@ -43,7 +45,8 @@ public class Question {
         this.date = date;
     }
 
-    public Question(String title, String description, String userName, String imageResource, List<String> answers, Date date) {
+    public Question(String id, String title, String description, String userName, String imageResource, List<String> answers, Date date) {
+        this.id = id;
         this.title = title;
         this.description = description;
         this.answers = answers;
@@ -93,5 +96,13 @@ public class Question {
 
     public String getDescription() {
         return description;
+    }
+
+    public String getId() {
+        return id;
+    }
+
+    public void setId(String id) {
+        this.id = id;
     }
 }
