@@ -17,7 +17,7 @@
         <activity android:name=".Activities.RegisterActivity" />
         <activity android:name=".Activities.ProfileActivity"/>
         <activity android:name=".Activities.AnswerActivity"/>
-        <activity android:name=".Activities.QuestionActivity"/>
+        <activity android:name=".Activities.AddQuestionActivity"/>
         <activity android:name=".Activities.UsersQuestionsActivity"/>
         <activity
             android:name=".Activities.MainActivity"

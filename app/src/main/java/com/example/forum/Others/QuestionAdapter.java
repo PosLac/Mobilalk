@@ -135,15 +135,16 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
         }
 
         public void bindTo(Question currentItem) {
-            final ProgressDialog pd = new ProgressDialog(mContext);
-            pd.setTitle("Kis türelmet...");
-            pd.show();
 
             mUserNameText.setText(currentItem.getUserName());
             mTitleText.setText(currentItem.getTitle());
             mDescriptionText.setText(currentItem.getDescription());
 
             mStorageReference = FirebaseStorage.getInstance().getReference().child("images/" + currentItem.getImageResource());
+
+            final ProgressDialog pd = new ProgressDialog(mContext);
+            pd.setTitle("Kis türelmet...");
+            pd.show();
 
             try{
                 final File localFile = File.createTempFile(currentItem.getImageResource(), "png");

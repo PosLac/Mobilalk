@@ -20,20 +20,22 @@ import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 
-public class QuestionActivity extends AppCompatActivity {
+import java.util.Date;
+
+public class AddQuestionActivity extends AppCompatActivity {
 
     private DocumentReference reference;
     private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String currentuid = user.getUid();
-    private static final String LOG_TAG = QuestionActivity.class.getName();
+    private static final String LOG_TAG = AddQuestionActivity.class.getName();
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
 
-        setContentView(R.layout.activity_new_question);
+        setContentView(R.layout.activity_add_question);
     }
 
     public void submit(View view) {
@@ -58,24 +60,25 @@ public class QuestionActivity extends AppCompatActivity {
 
                                 String nameResult = task.getResult().getString("userName");
                                 String imageResult = task.getResult().getString("userImage");
+                                Date date = null;
 
-                                Question question = new Question(mTitle, mDescription, nameResult, imageResult, null);
+                                Question question = new Question(mTitle, mDescription, user.getEmail(), imageResult, null, nameResult,  date);
                                 db.collection("Questions").document().set(question).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
-                                            Toast.makeText(QuestionActivity.this, "Kérdésed kiírásra került", Toast.LENGTH_LONG).show();
+                                            Toast.makeText(AddQuestionActivity.this, "Kérdésed kiírásra került", Toast.LENGTH_LONG).show();
 //                                            Intent intent = new Intent(QuestionActivity.this, ForumActivity.class);
 //                                            startActivity(intent);
                                             finish();
                                         } else {
-                                            Toast.makeText(QuestionActivity.this, "Hiba a kirás során", Toast.LENGTH_SHORT).show();
+                                            Toast.makeText(AddQuestionActivity.this, "Hiba a kirás során", Toast.LENGTH_SHORT).show();
                                             finish();
                                         }
                                     }
                                 });
                             } else {
-                                Toast.makeText(QuestionActivity.this, "Hiba a kirás során", Toast.LENGTH_SHORT).show();
+                                Toast.makeText(AddQuestionActivity.this, "Hiba a kirás során", Toast.LENGTH_SHORT).show();
                                 Log.i(LOG_TAG, "baj" + task.getException().getMessage());
                                 finish();
                             }

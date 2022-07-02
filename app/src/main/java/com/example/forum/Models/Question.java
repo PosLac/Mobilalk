@@ -1,6 +1,9 @@
 package com.example.forum.Models;
 
+import com.google.firebase.firestore.ServerTimestamp;
+
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.List;
 
 public class Question {
@@ -9,7 +12,16 @@ public class Question {
     private List<String> answers = new ArrayList<String>();
     private String userName;
     private String userEmail;
-    private Date;// TODO: 2022. 07. 01.
+    @ServerTimestamp
+    private Date date;
+
+    public Date getDate() {
+        return date;
+    }
+
+    public void setDate(Date date) {
+        this.date = date;
+    }
 
     public String getUserName() {
         return userName;
@@ -21,21 +33,23 @@ public class Question {
 
     private String imageResource;
 
-    public Question(String title, String description, String userEmail, String imageResource, List<String> answers, String userName) {
+    public Question(String title, String description, String userEmail, String imageResource, List<String> answers, String userName, Date date) {
         this.title = title;
         this.description = description;
         this.answers = answers;
         this.userEmail = userEmail;
         this.imageResource = imageResource;
         this.userName = userName;
+        this.date = date;
     }
 
-    public Question(String title, String description, String userName, String imageResource, List<String> answers) {
+    public Question(String title, String description, String userName, String imageResource, List<String> answers, Date date) {
         this.title = title;
         this.description = description;
         this.answers = answers;
         this.imageResource = imageResource;
         this.userName = userName;
+        this.date = date;
     }
 
     public String getImageResource() {

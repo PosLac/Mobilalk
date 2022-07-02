@@ -76,4 +76,13 @@
             android:text="Válaszol"
             android:onClick="answer"/>
 
+        <Button
+            android:id="@+id/delete_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:layout_below="@id/doAnswer"
+            android:layout_centerHorizontal="true"
+            android:text="Törlés"
+            android:onClick="delete"/>
+
 </RelativeLayout>

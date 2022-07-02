@@ -76,24 +76,24 @@
     <LinearLayout
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
-        android:orientation="horizontal"
         android:layout_below="@id/passwordAgainEditText"
+        android:layout_centerHorizontal="true"
         android:layout_marginTop="50dp"
-        android:layout_centerHorizontal="true">
+        android:orientation="horizontal">
 
         <Button
             android:id="@+id/registerButton"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
-            android:text="@string/registration"
-            android:onClick="register"/>
+            android:onClick="register"
+            android:text="@string/registration" />
 
         <Button
             android:id="@+id/cancel"
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:layout_marginStart="40dp"
-            android:text="@string/cancel"
-            android:onClick="cancel"/>
-</LinearLayout>
+            android:onClick="cancel"
+            android:text="@string/cancel" />
+    </LinearLayout>
 </RelativeLayout>

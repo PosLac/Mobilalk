@@ -3,6 +3,7 @@ package com.example.forum.Activities;
 import android.content.Intent;
 import android.os.Bundle;
 import android.util.Log;
+import android.view.View;
 import android.widget.ArrayAdapter;
 import android.widget.ListView;
 
@@ -56,6 +57,7 @@ public class UsersQuestionsActivity extends AppCompatActivity {
         listView.setAdapter(adapter);
 
 
+
 //
 //        adapter = new ArrayAdapter<String>(this, R.layout.question_list, questions);
 //        ListView listView = (ListView) findViewById(R.id.questions);
@@ -82,5 +84,21 @@ public class UsersQuestionsActivity extends AppCompatActivity {
             }
             adapter.notifyDataSetChanged();
         });
+    }
+
+    public void delete_question(View view) {
+
+    }
+
+    public void open_question(View view) {
+        Intent intent = new Intent(UsersQuestionsActivity.this, AnswerActivity.class);
+
+        Log.d(LOG_TAG, "Open question");
+//        intent.putExtra("TITLE", mQuestionData.get(getAdapterPosition()).getTitle());
+//        intent.putExtra("DESC", mQuestionData.get(getAdapterPosition()).getDescription());
+//        intent.putExtra("IMAGE", mQuestionData.get(getAdapterPosition()).getImageResource());
+//        intent.putExtra("NAME", mQuestionData.get(getAdapterPosition()).getUserName());
+//        intent.putStringArrayListExtra("ANSWERS",(ArrayList<String>) mQuestionData.get(getAdapterPosition()).getAnswers());
+        startActivity(intent);
     }
 }

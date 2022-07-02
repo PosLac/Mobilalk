@@ -6,14 +6,12 @@ import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
 import android.content.Intent;
-import android.content.res.TypedArray;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
-import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.forum.Models.Question;
@@ -187,7 +185,7 @@ public class ForumActivity extends AppCompatActivity {
         }
 
         else{
-            Intent intent = new Intent(this, QuestionActivity.class);
+            Intent intent = new Intent(this, AddQuestionActivity.class);
             startActivity(intent);
         }
     }

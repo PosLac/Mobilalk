@@ -73,9 +73,9 @@
         android:layout_marginLeft="20dp"
         android:layout_marginTop="20dp"
         android:layout_marginRight="20dp"
-        android:backgroundTint="#EA1111"
+        android:backgroundTint="@color/red"
         android:onClick="deleteUser"
         android:text="Fiók törlése"
         android:textAlignment="center"
-        android:textColor="#FFFFFF" />
+        android:textColor="@color/white" />
 </RelativeLayout>
