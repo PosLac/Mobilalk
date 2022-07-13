@@ -29,6 +29,7 @@
         android:layout_marginRight="10dp"
         android:ems="10"
         android:hint="@string/email"
+        android:text="aaaaaa@gmail.com"
         android:inputType="textEmailAddress" />
 
     <EditText
@@ -41,6 +42,7 @@
         android:layout_marginRight="10dp"
         android:layout_marginBottom="50dp"
         android:ems="10"
+        android:text="aaaaaa"
         android:hint="@string/password"
         android:inputType="textPassword"
         tools:layout_editor_absoluteX="16dp" />
@@ -85,7 +87,7 @@
         android:layout_marginLeft="10dp"
         android:layout_marginTop="10dp"
         android:layout_marginRight="10dp"
-        android:onClick="register"
+        android:onClick="jumpToRegister"
         android:text="@string/registration" />
 
 </RelativeLayout>

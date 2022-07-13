@@ -4,6 +4,7 @@ package com.example.forum.Activities;
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;
+import android.net.Uri;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
@@ -30,6 +31,7 @@ import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.SetOptions;
+import com.google.firebase.storage.FirebaseStorage;
 
 import java.util.HashMap;
 import java.util.List;
@@ -41,64 +43,80 @@ public class QuestionActivity extends AppCompatActivity {
     private TextView mUserNameText;
     private TextView mDescriptionText;
     private String questionId;
-    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
+    private FirebaseUser user;
+    private FirebaseStorage storage;
 
     private List<String> answers;
     private ArrayAdapter adapter;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db;
     private Intent intent;
     private Button delete_button;
     private static final String LOG_TAG = QuestionActivity.class.getName();
-
+    private boolean guest;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_answer);
 
+        db = FirebaseFirestore.getInstance();
+
         intent = getIntent();
+
+        storage = FirebaseStorage.getInstance();
         questionId = intent.getStringExtra("QUESTION_ID");
 
         delete_button = (Button) findViewById(R.id.delete_button);
         delete_button.setVisibility(View.GONE);
 
-        mTitleText  = findViewById(R.id.title);
+        mTitleText = findViewById(R.id.title);
         mTitleText.setText(intent.getStringExtra("TITLE"));
 
-        mDescriptionText  = findViewById(R.id.description);
+        mDescriptionText = findViewById(R.id.description);
         mDescriptionText.setText(intent.getStringExtra("DESC"));
 
-        mUserNameText  = findViewById(R.id.userName);
+        mUserNameText = findViewById(R.id.userName);
         mUserNameText.setText(intent.getStringExtra("NAME"));
 
-        mUserImage  = findViewById(R.id.userImage);
-        Glide.with(this).load(intent.getExtras().getInt("IMAGE")).into(mUserImage);
+        mUserImage = findViewById(R.id.userImage);
 
         answers = intent.getStringArrayListExtra("ANSWERS");
 
-        if(answers != null){
+        if (answers != null) {
             adapter = new ArrayAdapter<String>(this, R.layout.activity_listview, answers);
             ListView listView = (ListView) findViewById(R.id.answers);
             listView.setAdapter(adapter);
         }
+
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        guest = user.isAnonymous();
     }
 
     @Override
     protected void onStart() {
         super.onStart();
-
-        if(user.getEmail().equals(intent.getStringExtra("EMAIL"))){
-            delete_button.setVisibility(View.VISIBLE);
-            Toast.makeText(this, "Hitelesitve", Toast.LENGTH_SHORT).show();
+        if (!guest) {
+            if (user.getEmail().equals(intent.getStringExtra("EMAIL"))) {
+                delete_button.setVisibility(View.VISIBLE);
+            }
         }
-        else{
-            Toast.makeText(this, "Nemjo", Toast.LENGTH_SHORT).show();
+
+        Log.i(LOG_TAG, "image: " + intent.getStringExtra("IMAGE"));
+        try {
+            storage.getReference().child("images/" + intent.getStringExtra("IMAGE")).getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                @Override
+                public void onComplete(@NonNull Task<Uri> task) {
+                    Glide.with(QuestionActivity.this).load(task.getResult()).into(mUserImage);
+                    Log.i(LOG_TAG, "image: " + intent.getStringExtra("IMAGE"));
+                }
+            });
+        }
+        catch (Exception e){
+            Log.i(LOG_TAG, e.getMessage());
         }
     }
-
     public void answer(View view) {
 
-        boolean guest = getIntent().getBooleanExtra("guest", false);
         if(guest){
             Toast.makeText(this, "Vendégkét nem elérhető.", Toast.LENGTH_SHORT).show();
         }

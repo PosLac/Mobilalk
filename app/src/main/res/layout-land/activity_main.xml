@@ -62,7 +62,7 @@ xmlns:android="http://schemas.android.com/apk/res/android"
                     android:layout_height="wrap_content"
                     android:layout_marginTop="30dp"
                     android:layout_gravity="center"
-                    android:onClick="register"
+                    android:onClick="jumpToRegister"
                     android:text="@string/registration"
                     app:layout_constraintVertical_bias="0.078" />
 

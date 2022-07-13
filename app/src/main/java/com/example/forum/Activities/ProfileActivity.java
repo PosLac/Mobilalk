@@ -3,6 +3,7 @@ package com.example.forum.Activities;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,6 +25,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.Registry;
+import com.bumptech.glide.annotation.GlideModule;
+import com.bumptech.glide.module.AppGlideModule;
 import com.example.forum.Models.User;
 import com.example.forum.R;
 import com.google.android.gms.tasks.OnCompleteListener;
@@ -45,7 +49,9 @@ import com.google.firebase.storage.UploadTask;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.UUID;
+
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -55,15 +61,14 @@ public class ProfileActivity extends AppCompatActivity {
     private Uri imageUri;
     private static final String LOG_TAG = ProfileActivity.class.getName();
     final private int REQUEST_CODE_ASK_PERMISSIONS = 420;
-    private DocumentReference reference;
-    private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
     private FirebaseStorage storage;
+    private DocumentReference reference;
+    private StorageReference storageReference;
     private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
     private FirebaseFirestore db = FirebaseFirestore.getInstance();
     private String currentuid = user.getUid();
-    private StorageReference storageReference;
-    private StorageReference mStorageReference;
     private Bitmap bitmap;
+
 
     @SuppressLint("ResourceType")
     @Override
@@ -85,6 +90,55 @@ public class ProfileActivity extends AppCompatActivity {
 
 
 
+        final ProgressDialog pd = new ProgressDialog(this);
+        pd.setTitle("Kis türelmet..");
+        pd.show();
+
+        reference = db.collection("Users").document(currentuid);
+
+        reference.get()
+                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
+                    @Override
+                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
+                        if (task.isSuccessful()) {
+
+                            String nameResult = task.getResult().getString("userName");
+                            String emailResult = task.getResult().getString("email");
+                            String imageResult = task.getResult().getString("userImage");
+
+
+                            Log.i(LOG_TAG, "image: " +imageResult);
+
+                            userNameEditText.setText(nameResult);
+                            userEmailTextView.setText(emailResult);
+
+                            try {
+                                storage.getReference().child("images/" + imageResult).getDownloadUrl().addOnCompleteListener(new OnCompleteListener<Uri>() {
+                                    @Override
+                                    public void onComplete(@NonNull Task<Uri> task) {
+                                        Glide.with(ProfileActivity.this).load(task.getResult()).into(userProfileImage);
+                                        pd.dismiss();
+                                    }
+                                }).addOnFailureListener(new OnFailureListener() {
+                                    @Override
+                                    public void onFailure(@NonNull Exception e) {
+                                        Glide.with(ProfileActivity.this).load(R.drawable.default_profile_picture).into(userProfileImage);
+                                        pd.dismiss();
+                                    }
+                                });
+
+                            }catch (Exception e){
+                                Log.i(LOG_TAG, e.getMessage());
+                            }
+                        } else {
+                            pd.dismiss();
+                            Toast.makeText(ProfileActivity.this, "Hiba", Toast.LENGTH_SHORT).show();
+                            Log.i(LOG_TAG, "baj" + task.getException().getMessage() );
+                        }
+                    }
+                });
+
+
         userProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
@@ -92,17 +146,10 @@ public class ProfileActivity extends AppCompatActivity {
             }
         });
 
-//        Glide.with(this).load(intent.getIntExtra("currentUserImage", 2131230893)).into(userProfileImage);
     }
 
-    private void choosePicture() {
-        Intent intent = new Intent();
-        intent.setType("image/*");
-        intent.setAction(Intent.ACTION_GET_CONTENT);
-        startActivityForResult(intent, 1);
-    }
 
-    void checkUserPermission(){
+    public void checkUserPermission(){
         if(Build.VERSION.SDK_INT >= 23){
             if(ActivityCompat.checkSelfPermission(ProfileActivity.this, android.Manifest.permission.READ_EXTERNAL_STORAGE) != PackageManager.PERMISSION_GRANTED){
                 requestPermissions(new String[]{android.Manifest.permission.READ_EXTERNAL_STORAGE}, REQUEST_CODE_ASK_PERMISSIONS);
@@ -128,12 +175,21 @@ public class ProfileActivity extends AppCompatActivity {
         }
     }
 
+    private void choosePicture() {
+        Intent intent = new Intent();
+        intent.setType("image/*");
+        intent.setAction(Intent.ACTION_GET_CONTENT);
+        startActivityForResult(intent, 1);
+    }
+
     @Override
     protected void onActivityResult(int requestCode, int resultCode, @Nullable Intent data) {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null){
             imageUri = data.getData();
+            Log.d(LOG_TAG, "okes");
             userProfileImage.setImageURI(imageUri);
+
             Log.d(LOG_TAG, "okes");
 
             uploadPicture();
@@ -165,6 +221,8 @@ public class ProfileActivity extends AppCompatActivity {
                         Log.d(LOG_TAG, "hiba");
                     }
                 });
+
+        db.collection("Users").document(currentuid).update("userImage", randomKey);
     }
 
     private void ShowDialog() {
@@ -185,6 +243,8 @@ public class ProfileActivity extends AppCompatActivity {
                             public void onSuccess(Void unused) {
                                 Toast.makeText(ProfileActivity.this, "Fiók törölve", Toast.LENGTH_SHORT).show();
                                 Log.i(LOG_TAG, "siker");
+                                Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
+                                startActivity(intent);
                             }
                         }).addOnFailureListener(new OnFailureListener() {
                             @Override
@@ -244,63 +304,10 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
+
     @Override
     protected void onStart() {
         super.onStart();
-
-        final ProgressDialog pd = new ProgressDialog(this);
-        pd.setTitle("Kis türelmet..");
-        pd.show();
-
-        reference = firestore.collection("Users").document(currentuid);
-
-        reference.get()
-                .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
-                    @Override
-                    public void onComplete(@NonNull Task<DocumentSnapshot> task) {
-                        if (task.isSuccessful()) {
-
-                            String nameResult = task.getResult().getString("userName");
-                            String emailResult = task.getResult().getString("email");
-                            String imageResult = task.getResult().getString("userImage");
-
-                            userNameEditText.setText(nameResult);
-                            userEmailTextView.setText(emailResult);
-
-                            mStorageReference = FirebaseStorage.getInstance().getReference().child("images/" + imageResult);
-
-                            try{
-                                final File localFile = File.createTempFile(imageResult, "png");
-                                mStorageReference.getFile(localFile).addOnSuccessListener(new OnSuccessListener<FileDownloadTask.TaskSnapshot>() {
-                                    @Override
-                                    public void onSuccess(FileDownloadTask.TaskSnapshot taskSnapshot) {
-//                                        Toast.makeText(ProfileActivity.this, "Sikeres lekérés" ,Toast.LENGTH_SHORT).show();
-                                        bitmap = BitmapFactory.decodeFile(localFile.getAbsolutePath());
-                                        ((ImageView)findViewById(R.id.userProfileImage)).setImageBitmap(bitmap);
-                                        pd.dismiss();
-                                    }
-                                }).addOnFailureListener(new OnFailureListener() {
-                                    @Override
-                                    public void onFailure(@NonNull Exception e) {
-//                                        Toast.makeText(ProfileActivity.this, "Sikertelen lekérés" ,Toast.LENGTH_SHORT).show();
-                                        e.printStackTrace();
-                                        pd.dismiss();
-                                    }
-                                });
-
-                            }catch (IOException e){
-                                e.printStackTrace();
-                                pd.dismiss();
-                            }
-
-                        } else {
-                            pd.dismiss();
-                            Toast.makeText(ProfileActivity.this, "Hiba", Toast.LENGTH_SHORT).show();
-                            Log.i(LOG_TAG, "baj" + task.getException().getMessage() );
-                        }
-                    }
-                });
-
         Log.i(LOG_TAG, "onStart");
     }
 
@@ -336,4 +343,5 @@ public class ProfileActivity extends AppCompatActivity {
     public void deleteUser(View view) {
         ShowDialog();
     }
+
 }

@@ -5,6 +5,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.GridLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 
+import android.content.ClipData;
 import android.content.Intent;
 import android.os.Build;
 import android.os.Bundle;
@@ -12,12 +13,14 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 import android.view.View;
+import android.widget.Button;
 import android.widget.Toast;
 
 import com.example.forum.Models.Question;
 import com.example.forum.Models.User;
 import com.example.forum.Others.QuestionAdapter;
 import com.example.forum.R;
+import com.google.android.material.floatingactionbutton.FloatingActionButton;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.firestore.CollectionReference;
@@ -40,12 +43,18 @@ public class ForumActivity extends AppCompatActivity {
     private int gridNumber = 1; //oszlopszám
     private boolean viewRow = true;
     private boolean guest;
+//    private Button profile;
+//    private Button questions;
+//    private FloatingActionButton addQuestionButton;
+
 
     @RequiresApi(api = Build.VERSION_CODES.LOLLIPOP)
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_forum);
+
+        // TODO: 2022. 07. 12. kétszer jelennek meg a kérdések faszom
 
         user = FirebaseAuth.getInstance().getCurrentUser();
         if (user != null) {
@@ -55,6 +64,16 @@ public class ForumActivity extends AppCompatActivity {
             finish();
         }
 
+        user.reload();
+        Log.i(LOG_TAG, "guest: " + user.isAnonymous());
+        Log.i(LOG_TAG, "user: " + user);
+//
+//        questions = findViewById(R.id.questions_button);
+//        profile = findViewById(R.id.profile_button);
+//        addQuestionButton = findViewById(R.id.newQuestionActionButton);
+        guest = user.isAnonymous();
+       
+
         mRecyclerView = findViewById(R.id.recyclerView);
         mRecyclerView.setLayoutManager(new GridLayoutManager(this, gridNumber));
         mQuestionsData = new ArrayList<>();
@@ -63,20 +82,19 @@ public class ForumActivity extends AppCompatActivity {
 
         mFirestore = FirebaseFirestore.getInstance();
         mQuestions = mFirestore.collection("Questions");
-        guest = getIntent().getBooleanExtra("guest", false);
         queryData();
     }
 
-    private void queryData(){
+    private void queryData() {
         mQuestionsData.clear();
 
         mQuestions.orderBy("date").limit(10).get().addOnSuccessListener(queryDocumentSnapshots -> {
-            for(QueryDocumentSnapshot document : queryDocumentSnapshots){
+            for (QueryDocumentSnapshot document : queryDocumentSnapshots) {
                 Question question = document.toObject(Question.class);
                 mQuestionsData.add(question);
             }
 
-            if(mQuestionsData.size() == 0){
+            if (mQuestionsData.size() == 0) {
 //                initializeData();
                 queryData();
             }
@@ -111,6 +129,15 @@ public class ForumActivity extends AppCompatActivity {
 //        mAdapter.notifyDataSetChanged();
 //    }
 
+    // TODO: 2022. 07. 13. vmiért nem rejti el 
+//    public void hideItemsForGuest() {
+//        if (guest) {
+//            profile.setVisibility(View.GONE);
+//            questions.setVisibility(View.GONE);
+//            addQuestionButton.setVisibility(View.GONE);
+//        }
+//    }
+
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         super.onCreateOptionsMenu(menu);
@@ -122,19 +149,17 @@ public class ForumActivity extends AppCompatActivity {
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
             case R.id.log_out_button:
-                    Log.d(LOG_TAG, "Logout clicked!");
-                    FirebaseAuth.getInstance().signOut();
-                    finish();
-                    return true;
+                Log.d(LOG_TAG, "Logout clicked!");
+                FirebaseAuth.getInstance().signOut();
+                finish();
+                return true;
             case R.id.profile_button:
                 Log.d(LOG_TAG, "Profile clicked!");
 
-                if(guest){
+                if (guest) {
                     Toast.makeText(this, "Vendégkét nem elérhető.", Toast.LENGTH_SHORT).show();
                     return true;
-                }
-
-                else{
+                } else {
 
                     Intent intent = new Intent(this, ProfileActivity.class);
                     intent.putExtra("SECRET_KEY", SECRET_KEY);
@@ -147,11 +172,10 @@ public class ForumActivity extends AppCompatActivity {
                     return true;
                 }
             case R.id.questions_button:
-                if(guest){
+                if (guest) {
                     Toast.makeText(this, "Vendégkét nem elérhető.", Toast.LENGTH_SHORT).show();
                     return true;
-                }
-                else{
+                } else {
                     Intent intent = new Intent(this, UsersQuestionsActivity.class);
                     startActivity(intent);
                 }
@@ -177,13 +201,9 @@ public class ForumActivity extends AppCompatActivity {
     }
 
     public void add_question(View view) {
-
-        boolean guest = getIntent().getBooleanExtra("guest", false);
-        if(guest){
+        if (guest) {
             Toast.makeText(this, "Vendégkét nem elérhető.", Toast.LENGTH_SHORT).show();
-        }
-
-        else{
+        } else {
             Intent intent = new Intent(this, AddQuestionActivity.class);
             startActivity(intent);
         }
@@ -206,4 +226,3 @@ public class ForumActivity extends AppCompatActivity {
         queryData();
     }
 }
-

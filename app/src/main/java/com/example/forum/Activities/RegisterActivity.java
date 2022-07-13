@@ -76,7 +76,8 @@ public class RegisterActivity extends AppCompatActivity {
 
         userName = userNameEditText.getText().toString();
         email = userEmailEditText.getText().toString();
-        String userImage = "cb7e58bc-d23f-415a-9365-e3dfcfd1dc32";
+        String userImage = "default_profile_picture.png";
+        // TODO: 2022. 07. 03.  
         String password = passwordEditText.getText().toString();
         String passwordConfirm = passwordConfirmEditText.getText().toString();
 
@@ -98,7 +99,7 @@ public class RegisterActivity extends AppCompatActivity {
                             @Override
                             public void onComplete(@NonNull Task<Void> task) {
                                 if (task.isSuccessful()) {
-                                    Toast.makeText(RegisterActivity.this, "Sikeres", Toast.LENGTH_SHORT).show();
+                                    Toast.makeText(RegisterActivity.this, "Sikeres regisztráció", Toast.LENGTH_SHORT).show();
                                 } else {
                                     Toast.makeText(RegisterActivity.this, "Hiba", Toast.LENGTH_SHORT).show();
                                 }

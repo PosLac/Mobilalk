@@ -7,6 +7,7 @@ import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
+import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
@@ -19,6 +20,7 @@ import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
+import com.example.forum.Models.User;
 import com.example.forum.Others.NotificationHandler;
 import com.example.forum.R;
 import com.example.forum.Others.ShakeSensor;
@@ -26,14 +28,30 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
+import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
+import com.google.android.gms.tasks.OnFailureListener;
+import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
+import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
+import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseReference;
+import com.google.firebase.database.FirebaseDatabase;
+import com.google.firebase.database.ValueEventListener;
+import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.FirebaseFirestore;
+import com.google.firebase.storage.FirebaseStorage;
+import com.google.firebase.storage.StorageReference;
+import com.google.firebase.storage.UploadTask;
+
 import java.io.IOException;
+import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -53,6 +71,10 @@ public class MainActivity extends AppCompatActivity{
     private Sensor mAccelerometer;
     private ShakeSensor mShakeDetector;
     private MediaPlayer mediaPlayer;
+    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private DocumentReference documentReference;
+    private FirebaseUser currentuser;
+    private StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -62,6 +84,9 @@ public class MainActivity extends AppCompatActivity{
 
         emailET = findViewById(R.id.editTextEmail);
         passwordET = findViewById(R.id.editTextPassword);
+
+        FirebaseStorage storage = FirebaseStorage.getInstance();
+        storageReference = storage.getReference("images");
 
         preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
         mAuth = FirebaseAuth.getInstance();
@@ -104,6 +129,7 @@ public class MainActivity extends AppCompatActivity{
                 GoogleSignInAccount account = task.getResult(ApiException.class);
                 Log.d(LOG_TAG, "firebaseAuthWithGoogle:" + account.getId());
                 firebaseAuthWithGoogle(account.getIdToken());
+
             } catch (ApiException e) {
                 Log.w(LOG_TAG, "Google sign in failed", e);
             }
@@ -120,7 +146,29 @@ public class MainActivity extends AppCompatActivity{
                             Log.d(LOG_TAG, "signInWithCredential:success");
 
                             mNotificationHandler = new NotificationHandler(MainActivity.this);
-//                        mNotificationHandler.send("Jó újra látni!");
+//                          mNotificationHandler.send("Jó újra látni!");
+//
+//                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
+//                            ref.child("Users").child("username").addListenerForSingleValueEvent(new ValueEventListener() {
+//                                @Override
+//                                public void onDataChange(DataSnapshot dataSnapshot) {
+//                                    if(dataSnapshot.exists()){
+//                                        // use "username" already exists
+//                                        // Let the user know he needs to pick another username.
+//                                    } else {
+//                                        // User does not exist. NOW call createUserWithEmailAndPassword
+//                                        mAuth.createUserWithPassword(...);
+//                                        // Your previous code here.
+//
+//                                    }
+//                                }
+//
+//                                @Override
+//                                public void onCancelled(DatabaseError databaseError) {
+//
+//                                }
+//                            });
+                            saveUser();
                             startForum();
                         } else {
                             Log.w(LOG_TAG, "signInWithCredential:failure", task.getException());
@@ -129,9 +177,62 @@ public class MainActivity extends AppCompatActivity{
                 });
     }
 
+    public void saveUser(){
+        currentuser = FirebaseAuth.getInstance().getCurrentUser();
+        if (currentuser != null) {
+
+//            Uri photoUrl = currentuser.getPhotoUrl();
+//            StorageReference ref = storageReference.child("default_profile_picture.png");
+
+
+//            ref.putFile(photoUrl).addOnSuccessListener(new OnSuccessListener<UploadTask.TaskSnapshot>() {
+//                @Override
+//                public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
+//                    Log.d(LOG_TAG, "Uploaded succesfully");
+//                }
+//            })
+//                    .addOnFailureListener(new OnFailureListener() {
+//                        @Override
+//                        public void onFailure(@NonNull Exception e) {
+//                            Log.d(LOG_TAG, "Error during upload");
+//                        }
+//                    });todo de amugy annyira nem fontos
+
+
+            String email = currentuser.getEmail();
+            String userName = email.split("@")[0];
+
+            User user = new User(userName, email, "default_profile_picture.png");
+
+            db.collection("Users").document(currentuser.getUid()).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
+                @Override
+                public void onComplete(@NonNull Task<Void> task) {
+                    if (task.isSuccessful()) {
+                        Toast.makeText(MainActivity.this, "Sikeres", Toast.LENGTH_SHORT).show();
+                    } else {
+                        Toast.makeText(MainActivity.this, "Hiba", Toast.LENGTH_SHORT).show();
+                    }
+                    Log.d(LOG_TAG, "User created successfully");
+                }
+            });
+            Log.i(LOG_TAG, email);
+            Log.i(LOG_TAG, userName);
+        }
+    }
+
+    public void loginWithGoogle(View view) {
+        b = (Button) findViewById(R.id.googleSignInButton);
+        Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
+        b.startAnimation(animation);
+
+        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
+        startActivityForResult(signInIntent, RC_SIGN_IN);
+    }
+
     public void startForum() {
         Intent intent = new Intent(this, ForumActivity.class);
         startActivity(intent);
+        finish();
     }
 
     public void login(View view) {
@@ -151,7 +252,7 @@ public class MainActivity extends AppCompatActivity{
                     if (task.isSuccessful()) {
                         Log.d(LOG_TAG, "Login was successfull.");
                         mNotificationHandler = new NotificationHandler(MainActivity.this);
-//                        mNotificationHandler.send("Jó újra látni!");
+//                        mNotificationHandler.send("Jó újra látni!"); todo
                         startForum();
                     } else {
                         Log.d(LOG_TAG, "User login fail:", task.getException());
@@ -175,11 +276,8 @@ public class MainActivity extends AppCompatActivity{
 //                    mNotificationHandler = new NotificationHandler(MainActivity.this);
 //                    mNotificationHandler.send("Jó újra látni!");
 
-                    Intent intent = new Intent(MainActivity.this, ForumActivity.class);
-                    intent.putExtra("guest", true);
-                    startActivity(intent);
 
-//                    startForum();
+                    startForum();
                 } else {
                     Log.d(LOG_TAG, "Anonim user login fail:", task.getException());
                     Toast.makeText(MainActivity.this, "Vendégbejelentkezés sikertelen: " + task.getException().getMessage(), Toast.LENGTH_LONG).show();
@@ -188,16 +286,8 @@ public class MainActivity extends AppCompatActivity{
         });
     }
 
-    public void loginWithGoogle(View view) {
-        b = (Button) findViewById(R.id.googleSignInButton);
-        Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
-        b.startAnimation(animation);
 
-        Intent signInIntent = mGoogleSignInClient.getSignInIntent();
-        startActivityForResult(signInIntent, RC_SIGN_IN);
-    }
-
-    public void register(View view) {
+    public void jumpToRegister(View view) {
         b = (Button) findViewById(R.id.registerButton);
         Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
         b.startAnimation(animation);
