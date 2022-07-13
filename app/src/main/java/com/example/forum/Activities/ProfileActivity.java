@@ -3,12 +3,9 @@ package com.example.forum.Activities;
 import android.annotation.SuppressLint;
 import android.app.AlertDialog;
 import android.app.ProgressDialog;
-import android.content.Context;
 import android.content.DialogInterface;
 import android.content.Intent;
 import android.content.pm.PackageManager;
-import android.graphics.Bitmap;
-import android.graphics.BitmapFactory;
 import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
@@ -25,10 +22,6 @@ import androidx.appcompat.app.AppCompatActivity;
 import androidx.core.app.ActivityCompat;
 
 import com.bumptech.glide.Glide;
-import com.bumptech.glide.Registry;
-import com.bumptech.glide.annotation.GlideModule;
-import com.bumptech.glide.module.AppGlideModule;
-import com.example.forum.Models.User;
 import com.example.forum.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,16 +35,11 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.firestore.FirebaseFirestoreException;
 import com.google.firebase.firestore.Transaction;
-import com.google.firebase.storage.FileDownloadTask;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
 import com.google.firebase.storage.UploadTask;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.InputStream;
 import java.util.UUID;
-
 
 public class ProfileActivity extends AppCompatActivity {
 
@@ -64,10 +52,9 @@ public class ProfileActivity extends AppCompatActivity {
     private FirebaseStorage storage;
     private DocumentReference reference;
     private StorageReference storageReference;
-    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String currentuid = user.getUid();
-    private Bitmap bitmap;
+    private FirebaseUser user;
+    private FirebaseFirestore db;
+    private String currentuid;
 
 
     @SuppressLint("ResourceType")
@@ -75,11 +62,9 @@ public class ProfileActivity extends AppCompatActivity {
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.profile);
-
-//
-//        Intent intent = getIntent();
-////        currentUser = new User(intent.getStringExtra("currentUserName"), intent.getStringExtra("currentUserEmail"), intent.getStringExtra("currentUserImage"));
-
+        user = FirebaseAuth.getInstance().getCurrentUser();
+        db = FirebaseFirestore.getInstance();
+        currentuid  = user.getUid();
 
         userProfileImage = findViewById(R.id.userProfileImage);
         userNameEditText = findViewById(R.id.userName);
@@ -88,14 +73,11 @@ public class ProfileActivity extends AppCompatActivity {
         storage = FirebaseStorage.getInstance();
         storageReference = storage.getReference("images");
 
-
-
         final ProgressDialog pd = new ProgressDialog(this);
-        pd.setTitle("Kis türelmet..");
+        pd.setTitle("Profil betöltése..");
         pd.show();
 
         reference = db.collection("Users").document(currentuid);
-
         reference.get()
                 .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                     @Override
@@ -106,8 +88,7 @@ public class ProfileActivity extends AppCompatActivity {
                             String emailResult = task.getResult().getString("email");
                             String imageResult = task.getResult().getString("userImage");
 
-
-                            Log.i(LOG_TAG, "image: " +imageResult);
+                            Log.i(LOG_TAG, "image: " + imageResult);
 
                             userNameEditText.setText(nameResult);
                             userEmailTextView.setText(emailResult);
@@ -138,16 +119,13 @@ public class ProfileActivity extends AppCompatActivity {
                     }
                 });
 
-
         userProfileImage.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
                 checkUserPermission();
             }
         });
-
     }
-
 
     public void checkUserPermission(){
         if(Build.VERSION.SDK_INT >= 23){
@@ -162,16 +140,14 @@ public class ProfileActivity extends AppCompatActivity {
     @RequiresApi(api = Build.VERSION_CODES.M)
     @Override
     public void onRequestPermissionsResult(int requestCode, String[] permissions, int[] grantResults) {
-        switch (requestCode) {
-            case REQUEST_CODE_ASK_PERMISSIONS:
-                if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
-                    choosePicture();
-                } else {
-                    Toast.makeText(this, "Hozzáférés elutasítva.", Toast.LENGTH_SHORT).show();
-                }
-                break;
-            default:
-                super.onRequestPermissionsResult(requestCode, permissions, grantResults);
+        if (requestCode == REQUEST_CODE_ASK_PERMISSIONS) {
+            if (grantResults[0] == PackageManager.PERMISSION_GRANTED) {
+                choosePicture();
+            } else {
+                Toast.makeText(this, "Hozzáférés elutasítva.", Toast.LENGTH_SHORT).show();
+            }
+        } else {
+            super.onRequestPermissionsResult(requestCode, permissions, grantResults);
         }
     }
 
@@ -187,11 +163,7 @@ public class ProfileActivity extends AppCompatActivity {
         super.onActivityResult(requestCode, resultCode, data);
         if(requestCode == 1 && resultCode == RESULT_OK && data != null && data.getData() != null){
             imageUri = data.getData();
-            Log.d(LOG_TAG, "okes");
             userProfileImage.setImageURI(imageUri);
-
-            Log.d(LOG_TAG, "okes");
-
             uploadPicture();
         }
     }
@@ -210,7 +182,7 @@ public class ProfileActivity extends AppCompatActivity {
             public void onSuccess(UploadTask.TaskSnapshot taskSnapshot) {
                 pd.dismiss();
                 Snackbar.make(findViewById(R.id.userName), "Képfeltöltés sikeres", Snackbar.LENGTH_LONG).show();
-                Log.d(LOG_TAG, "siker");
+                Log.d(LOG_TAG, "Uploaded successfully");
             }
         })
                 .addOnFailureListener(new OnFailureListener() {
@@ -218,7 +190,7 @@ public class ProfileActivity extends AppCompatActivity {
                     public void onFailure(@NonNull Exception e) {
                         pd.dismiss();
                         Toast.makeText(ProfileActivity.this, "Hiba a feltöltés során", Toast.LENGTH_LONG).show();
-                        Log.d(LOG_TAG, "hiba");
+                        Log.d(LOG_TAG, "An error occured during upload: " + e.getMessage());
                     }
                 });
 
@@ -242,7 +214,7 @@ public class ProfileActivity extends AppCompatActivity {
                             @Override
                             public void onSuccess(Void unused) {
                                 Toast.makeText(ProfileActivity.this, "Fiók törölve", Toast.LENGTH_SHORT).show();
-                                Log.i(LOG_TAG, "siker");
+                                Log.i(LOG_TAG, "Profile deleted successfully");
                                 Intent intent = new Intent(ProfileActivity.this, MainActivity.class);
                                 startActivity(intent);
                             }
@@ -250,20 +222,17 @@ public class ProfileActivity extends AppCompatActivity {
                             @Override
                             public void onFailure(@NonNull Exception e) {
                                 Toast.makeText(ProfileActivity.this, "Fiók törlése sikertelen.", Toast.LENGTH_SHORT).show();
-                                Log.i(LOG_TAG, "gáz van " + e.getMessage());
+                                Log.i(LOG_TAG, "Error during delete: " + e.getMessage());
                             }
                         });
-                        Log.i(LOG_TAG, "Siker");
                     }
                 }).addOnFailureListener(new OnFailureListener() {
                     @Override
                     public void onFailure(@NonNull Exception e) {
                         Toast.makeText(ProfileActivity.this, "Fiók törlése sikertelen.", Toast.LENGTH_SHORT).show();
-                        Log.i(LOG_TAG, "gáz van " + e.getMessage());
+                        Log.i(LOG_TAG, "Error during delete: " + e.getMessage());
                     }
                 });
-
-
             }
         });
 
@@ -304,7 +273,6 @@ public class ProfileActivity extends AppCompatActivity {
         });
     }
 
-
     @Override
     protected void onStart() {
         super.onStart();
@@ -321,27 +289,7 @@ public class ProfileActivity extends AppCompatActivity {
         startForum();
     }
 
-    protected void onStop() {
-        super.onStop();
-        Log.i(LOG_TAG, "onStop");
-    }
-    protected void onPause() {
-        super.onPause();
-        Log.i(LOG_TAG, "onPause");
-    }
-
-    protected void onResume() {
-        super.onResume();
-        Log.i(LOG_TAG, "onResume");
-    }
-
-    protected void onRestart() {
-        super.onRestart();
-        Log.i(LOG_TAG, "onRestart");
-    }
-
     public void deleteUser(View view) {
         ShowDialog();
     }
-
 }

@@ -51,26 +51,6 @@ public class UsersQuestionsActivity extends AppCompatActivity {
         adapter = new ArrayAdapter<String>(UsersQuestionsActivity.this, R.layout.question_list, questionTitles);
         listView = (ListView) findViewById(R.id.questions);
         listView.setAdapter(adapter);
-
-
-
-
-//        if (intent != null) {
-//            data = intent.getExtras().getString("countryName");
-//            questions.add(data);
-//        } else {
-//            data = null;
-//        }
-
-
-//
-//        adapter = new ArrayAdapter<String>(this, R.layout.question_list, questions);
-//        ListView listView = (ListView) findViewById(R.id.questions);
-//        listView.setAdapter(adapter);
-
-//        Log.i(LOG_TAG, questions.get(0));
-
-        Log.i(LOG_TAG, "oncreate vege");
     }
 
     private void queryData() {
@@ -85,17 +65,11 @@ public class UsersQuestionsActivity extends AppCompatActivity {
             }
 
             if (mQuestionData.size() == 0) {
-//                initializeData();
                 queryData();
             }
             adapter.notifyDataSetChanged();
         });
     }
-
-    public void delete_question(View view) {
-
-    }
-
 
     @Override
     protected void onStart() {
@@ -107,11 +81,6 @@ public class UsersQuestionsActivity extends AppCompatActivity {
             public void onItemClick(AdapterView<?> adapterView, View view, int position, long l) {
 
                 Log.d(LOG_TAG, "Open question");
-//                Log.d(LOG_TAG, mQuestionData.get(position).getId());
-//                Log.d(LOG_TAG, mQuestionData.get(position).getTitle());
-//                Log.d(LOG_TAG, mQuestionData.get(position).getDescription());
-//                Log.d(LOG_TAG, mQuestionData.get(position).getImageResource());
-
 
                 intent.putExtra("EMAIL", mQuestionData.get(position).getUserEmail());
                 intent.putExtra("QUESTION_ID", mQuestionData.get(position).getId());
@@ -125,5 +94,4 @@ public class UsersQuestionsActivity extends AppCompatActivity {
             }
         });
     }
-
 }

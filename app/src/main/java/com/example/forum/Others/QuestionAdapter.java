@@ -11,6 +11,7 @@ import android.view.View;
 import android.view.ViewGroup;
 import android.view.animation.Animation;
 import android.view.animation.AnimationUtils;
+import android.widget.Button;
 import android.widget.Filter;
 import android.widget.Filterable;
 import android.widget.ImageView;
@@ -20,6 +21,7 @@ import androidx.annotation.NonNull;
 import androidx.recyclerview.widget.RecyclerView;
 
 import com.example.forum.Activities.QuestionActivity;
+import com.example.forum.Activities.RegisterActivity;
 import com.example.forum.Models.Question;
 import com.example.forum.R;
 import com.google.android.gms.tasks.OnFailureListener;
@@ -42,6 +44,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
     public Context mContext;
     public int lastPosition = -1;
     private StorageReference mStorageReference;
+    private Button b;
 
     public QuestionAdapter(Context context, ArrayList<Question> itemsData){
         this.mQuestionData = itemsData;
@@ -70,6 +73,7 @@ public class QuestionAdapter extends RecyclerView.Adapter<QuestionAdapter.ViewHo
     public int getItemCount() {
         return mQuestionData.size();
     }
+
 
     @Override
     public Filter getFilter() {

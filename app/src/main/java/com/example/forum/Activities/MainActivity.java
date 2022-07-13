@@ -7,13 +7,10 @@ import android.content.SharedPreferences;
 import android.hardware.Sensor;
 import android.hardware.SensorManager;
 import android.media.MediaPlayer;
-import android.net.Uri;
 import android.os.Build;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.Toast;
@@ -21,6 +18,7 @@ import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.example.forum.Models.User;
+import com.example.forum.Others.Animation;
 import com.example.forum.Others.NotificationHandler;
 import com.example.forum.R;
 import com.example.forum.Others.ShakeSensor;
@@ -28,30 +26,20 @@ import com.google.android.gms.auth.api.signin.GoogleSignIn;
 import com.google.android.gms.auth.api.signin.GoogleSignInAccount;
 import com.google.android.gms.auth.api.signin.GoogleSignInClient;
 import com.google.android.gms.auth.api.signin.GoogleSignInOptions;
-import com.google.android.gms.auth.api.signin.internal.Storage;
 import com.google.android.gms.common.api.ApiException;
 import com.google.android.gms.tasks.OnCompleteListener;
-import com.google.android.gms.tasks.OnFailureListener;
-import com.google.android.gms.tasks.OnSuccessListener;
 import com.google.android.gms.tasks.Task;
-import com.google.android.material.snackbar.Snackbar;
 import com.google.firebase.auth.AuthCredential;
 import com.google.firebase.auth.AuthResult;
 import com.google.firebase.auth.FirebaseAuth;
 import com.google.firebase.auth.FirebaseUser;
 import com.google.firebase.auth.GoogleAuthProvider;
-import com.google.firebase.database.DataSnapshot;
-import com.google.firebase.database.DatabaseReference;
-import com.google.firebase.database.FirebaseDatabase;
-import com.google.firebase.database.ValueEventListener;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.FirebaseFirestore;
 import com.google.firebase.storage.FirebaseStorage;
 import com.google.firebase.storage.StorageReference;
-import com.google.firebase.storage.UploadTask;
 
 import java.io.IOException;
-import java.util.UUID;
 
 public class MainActivity extends AppCompatActivity{
 
@@ -66,15 +54,12 @@ public class MainActivity extends AppCompatActivity{
     private SharedPreferences preferences;
     private FirebaseAuth mAuth;
     private GoogleSignInClient mGoogleSignInClient;
-    private Button b;
     private SensorManager mSensorManager;
     private Sensor mAccelerometer;
     private ShakeSensor mShakeDetector;
     private MediaPlayer mediaPlayer;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private DocumentReference documentReference;
+    private FirebaseFirestore db;
     private FirebaseUser currentuser;
-    private StorageReference storageReference;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -82,11 +67,11 @@ public class MainActivity extends AppCompatActivity{
         setContentView(R.layout.activity_main);
         Toast.makeText(MainActivity.this, "Rázd meg a telefont!", Toast.LENGTH_LONG).show();
 
+        mNotificationHandler = new NotificationHandler(MainActivity.this);
+
+        db = FirebaseFirestore.getInstance();
         emailET = findViewById(R.id.editTextEmail);
         passwordET = findViewById(R.id.editTextPassword);
-
-        FirebaseStorage storage = FirebaseStorage.getInstance();
-        storageReference = storage.getReference("images");
 
         preferences = getSharedPreferences(PREF_KEY, MODE_PRIVATE);
         mAuth = FirebaseAuth.getInstance();
@@ -95,14 +80,13 @@ public class MainActivity extends AppCompatActivity{
                 .requestIdToken(getString(R.string.default_web_client_id))
                 .requestEmail().build();
         mGoogleSignInClient = GoogleSignIn.getClient(this, gso);
-
         mSensorManager = (SensorManager) getSystemService(Context.SENSOR_SERVICE);
         mAccelerometer = mSensorManager
                 .getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
         mShakeDetector = new ShakeSensor();
         mShakeDetector.setOnShakeListener(new ShakeSensor.OnShakeListener() {
             public void onShake() {
-                if (Build.VERSION.SDK_INT >= 23 && isRunning == false) {
+                if (Build.VERSION.SDK_INT >= 23 && !isRunning) {
                     isRunning = true;
                     mediaPlayer = new MediaPlayer();
                     try {
@@ -145,29 +129,9 @@ public class MainActivity extends AppCompatActivity{
                         if (task.isSuccessful()) {
                             Log.d(LOG_TAG, "signInWithCredential:success");
 
-                            mNotificationHandler = new NotificationHandler(MainActivity.this);
+                            // TODO: 2022. 07. 13. Turn on
 //                          mNotificationHandler.send("Jó újra látni!");
-//
-//                            DatabaseReference ref = FirebaseDatabase.getInstance().getReference();
-//                            ref.child("Users").child("username").addListenerForSingleValueEvent(new ValueEventListener() {
-//                                @Override
-//                                public void onDataChange(DataSnapshot dataSnapshot) {
-//                                    if(dataSnapshot.exists()){
-//                                        // use "username" already exists
-//                                        // Let the user know he needs to pick another username.
-//                                    } else {
-//                                        // User does not exist. NOW call createUserWithEmailAndPassword
-//                                        mAuth.createUserWithPassword(...);
-//                                        // Your previous code here.
-//
-//                                    }
-//                                }
-//
-//                                @Override
-//                                public void onCancelled(DatabaseError databaseError) {
-//
-//                                }
-//                            });
+
                             saveUser();
                             startForum();
                         } else {
@@ -204,6 +168,7 @@ public class MainActivity extends AppCompatActivity{
 
             User user = new User(userName, email, "default_profile_picture.png");
 
+            // TODO: 2022. 07. 13. Check duplicates
             db.collection("Users").document(currentuser.getUid()).set(user).addOnCompleteListener(new OnCompleteListener<Void>() {
                 @Override
                 public void onComplete(@NonNull Task<Void> task) {
@@ -221,9 +186,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void loginWithGoogle(View view) {
-        b = (Button) findViewById(R.id.googleSignInButton);
-        Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
-        b.startAnimation(animation);
+        Animation.animation(this, R.id.googleSignInButton, R.anim.bounce);
 
         Intent signInIntent = mGoogleSignInClient.getSignInIntent();
         startActivityForResult(signInIntent, RC_SIGN_IN);
@@ -236,9 +199,7 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void login(View view) {
-        b = (Button) findViewById(R.id.loginButton);
-        Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
-        b.startAnimation(animation);
+        Animation.animation(this, R.id.loginButton, R.anim.bounce);
 
         String email = emailET.getText().toString();
         String password = passwordET.getText().toString();
@@ -251,8 +212,8 @@ public class MainActivity extends AppCompatActivity{
                 public void onComplete(@NonNull Task<AuthResult> task) {
                     if (task.isSuccessful()) {
                         Log.d(LOG_TAG, "Login was successfull.");
-                        mNotificationHandler = new NotificationHandler(MainActivity.this);
-//                        mNotificationHandler.send("Jó újra látni!"); todo
+                        // TODO: 2022. 07. 13. Turn on
+//                        mNotificationHandler.send("Jó újra látni!");
                         startForum();
                     } else {
                         Log.d(LOG_TAG, "User login fail:", task.getException());
@@ -264,18 +225,16 @@ public class MainActivity extends AppCompatActivity{
     }
 
     public void loginAsGuest(View view) {
-        b = (Button) findViewById(R.id.guestLoginButton);
-        Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
-        b.startAnimation(animation);
+        Animation.animation(this, R.id.guestLoginButton, R.anim.bounce);
 
         mAuth.signInAnonymously().addOnCompleteListener(this, new OnCompleteListener<AuthResult>() {
             @Override
             public void onComplete(@NonNull Task<AuthResult> task) {
                 if (task.isSuccessful()) {
                     Log.d(LOG_TAG, "Anonim login was successfull.");
-//                    mNotificationHandler = new NotificationHandler(MainActivity.this);
-//                    mNotificationHandler.send("Jó újra látni!");
 
+                    // TODO: 2022. 07. 13. Turn on
+//                    mNotificationHandler.send("Jó újra látni!");
 
                     startForum();
                 } else {
@@ -287,10 +246,10 @@ public class MainActivity extends AppCompatActivity{
     }
 
 
+
     public void jumpToRegister(View view) {
-        b = (Button) findViewById(R.id.registerButton);
-        Animation animation = AnimationUtils.loadAnimation(MainActivity.this, R.anim.bounce);
-        b.startAnimation(animation);
+
+        Animation.animation(this, R.id.registerButton, R.anim.bounce);
 
         Intent intent = new Intent(this, RegisterActivity.class);
         intent.putExtra("SECRET_KEY", SECRET_KEY);

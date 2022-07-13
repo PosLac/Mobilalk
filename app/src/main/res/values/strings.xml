@@ -1,6 +1,5 @@
 <resources>
     <string name="app_name">Forum</string>
-    <string name="name">Felhasználónév</string>
     <string name="password">Jelszó</string>
     <string name="login">Bejelentkezés</string>
     <string name="registration">Regisztráció</string>

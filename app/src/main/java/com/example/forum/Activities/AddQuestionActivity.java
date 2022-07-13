@@ -20,7 +20,6 @@ import com.google.firebase.auth.UserInfo;
 import com.google.firebase.firestore.DocumentReference;
 import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FirebaseFirestore;
-import com.google.firebase.storage.StorageReference;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -30,34 +29,39 @@ import java.util.UUID;
 public class AddQuestionActivity extends AppCompatActivity {
 
     private DocumentReference reference;
-    private FirebaseFirestore firestore = FirebaseFirestore.getInstance();
-    private FirebaseUser user = FirebaseAuth.getInstance().getCurrentUser();
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
-    private String currentuid = user.getUid();
+    private FirebaseFirestore firestore;
+    private FirebaseUser user;
+    private String currentuid;
     private static final String LOG_TAG = AddQuestionActivity.class.getName();
-    private StorageReference storageReference;
+    private EditText title;
+    private EditText description;
+    private String mTitle;
+    private String mDescription;
 
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-
         setContentView(R.layout.activity_add_question);
+
+        firestore = FirebaseFirestore.getInstance();
+        user = FirebaseAuth.getInstance().getCurrentUser();
+
+        if(user != null){
+            currentuid = user.getUid();
+        }
     }
 
     public void submit(View view) {
-        FirebaseFirestore db = FirebaseFirestore.getInstance();
-        EditText title = findViewById(R.id.question_title);
-        EditText description = findViewById(R.id.question_description);
-
-        String mTitle = title.getText().toString();
-        String mDescription = description.getText().toString();
+        title = findViewById(R.id.question_title);
+        description = findViewById(R.id.question_description);
+        mTitle = title.getText().toString();
+        mDescription = description.getText().toString();
 
         if (mTitle.equals("")) {
             Toast.makeText(this, "Kérdést kötelező megadni!", Toast.LENGTH_LONG).show();
         } else {
 
             reference = firestore.collection("Users").document(currentuid);
-
             reference.get()
                     .addOnCompleteListener(new OnCompleteListener<DocumentSnapshot>() {
                         @Override
@@ -78,23 +82,20 @@ public class AddQuestionActivity extends AppCompatActivity {
                                 }
 
                                 Question question = new Question(randomKey, mTitle, mDescription, user.getEmail(), imageResult, emptyArray, nameResult,  date);
-                                db.collection("Questions").document(randomKey).set(question).addOnCompleteListener(new OnCompleteListener<Void>() {
+                                firestore.collection("Questions").document(randomKey).set(question).addOnCompleteListener(new OnCompleteListener<Void>() {
                                     @Override
                                     public void onComplete(@NonNull Task<Void> task) {
                                         if (task.isSuccessful()) {
                                             Toast.makeText(AddQuestionActivity.this, "Kérdésed kiírásra került", Toast.LENGTH_LONG).show();
-//                                            Intent intent = new Intent(QuestionActivity.this, ForumActivity.class);
-//                                            startActivity(intent);
-                                            finish();
                                         } else {
                                             Toast.makeText(AddQuestionActivity.this, "Hiba a kirás során", Toast.LENGTH_SHORT).show();
-                                            finish();
                                         }
+                                        finish();
                                     }
                                 });
                             } else {
                                 Toast.makeText(AddQuestionActivity.this, "Hiba a kirás során", Toast.LENGTH_SHORT).show();
-                                Log.i(LOG_TAG, "baj" + task.getException().getMessage());
+                                Log.i(LOG_TAG, "Oops" + task.getException().getMessage());
                                 finish();
                             }
                         }

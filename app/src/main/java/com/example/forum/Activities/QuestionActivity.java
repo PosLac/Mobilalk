@@ -1,6 +1,5 @@
 package com.example.forum.Activities;
 
-
 import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.content.Intent;

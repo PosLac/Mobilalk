@@ -8,14 +8,13 @@ import android.content.SharedPreferences;
 import android.os.Bundle;
 import android.util.Log;
 import android.view.View;
-import android.view.animation.Animation;
-import android.view.animation.AnimationUtils;
 import android.widget.Button;
 import android.widget.EditText;
 import android.widget.ImageView;
 import android.widget.Toast;
 
 import com.example.forum.Models.User;
+import com.example.forum.Others.Animation;
 import com.example.forum.R;
 import com.google.android.gms.tasks.OnCompleteListener;
 import com.google.android.gms.tasks.Task;
@@ -30,7 +29,7 @@ public class RegisterActivity extends AppCompatActivity {
     private EditText userEmailEditText;
     private EditText passwordEditText;
     private EditText passwordConfirmEditText;
-    private FirebaseFirestore db = FirebaseFirestore.getInstance();
+    private FirebaseFirestore db;
     private DocumentReference documentReference;
     private static final String LOG_TAG = RegisterActivity.class.getName();
     private static final String PREF_KEY = RegisterActivity.class.getPackage().toString();
@@ -44,7 +43,7 @@ public class RegisterActivity extends AppCompatActivity {
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_register);
-
+        db = FirebaseFirestore.getInstance();
         documentReference = db.collection("Users").document("profile");
 
         userImage = findViewById(R.id.userImage);
@@ -68,9 +67,8 @@ public class RegisterActivity extends AppCompatActivity {
 
 
     public void register(View view) {
-        b = (Button) findViewById(R.id.registerButton);
-        Animation animation = AnimationUtils.loadAnimation(RegisterActivity.this, R.anim.bounce);
-        b.startAnimation(animation);
+
+        Animation.animation(this, R.id.registerButton, R.anim.bounce);
 
         FirebaseFirestore db = FirebaseFirestore.getInstance();
 
@@ -117,48 +115,14 @@ public class RegisterActivity extends AppCompatActivity {
     }
 
     public void cancel(View view) {
-        b = (Button) findViewById(R.id.cancel);
-        Animation animation = AnimationUtils.loadAnimation(RegisterActivity.this, R.anim.bounce);
-        b.startAnimation(animation);
-
+        Animation.animation(this, R.id.cancel, R.anim.bounce);
         finish();
     }
 
     public void startForum() {
         Intent intent = new Intent(this, ForumActivity.class);
         intent.putExtra("currentUserName", userName);
-//        intent.putExtra("currentUserImage", "cb7e58bc-d23f-415a-9365-e3dfcfd1dc32");
 
         startActivity(intent);
-    }
-
-    @Override
-    protected void onStart() {
-        super.onStart();
-        Log.i(LOG_TAG, "onStart");
-    }
-
-    @Override
-    protected void onStop() {
-        super.onStop();
-        Log.i(LOG_TAG, "onStop");
-    }
-
-    @Override
-    protected void onPause() {
-        super.onPause();
-        Log.i(LOG_TAG, "onPause");
-    }
-
-    @Override
-    protected void onResume() {
-        super.onResume();
-        Log.i(LOG_TAG, "onResume");
-    }
-
-    @Override
-    protected void onRestart() {
-        super.onRestart();
-        Log.i(LOG_TAG, "onRestart");
     }
 }
